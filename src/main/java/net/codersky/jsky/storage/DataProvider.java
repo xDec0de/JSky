@@ -11,6 +11,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * The most basic type of {@code abstract class} capable of providing data.
+ * This {@code class} is not capable of <b>setting</b> data. For that, use
+ * a {@link DataManager}, as this is only designed to <b>provide</b> existing,
+ * non-modifiable data.
+ *
+ * @since JSky 1.0.0
+ *
+ * @author xDec0de_
+ */
 public abstract class DataProvider {
 
 	private final DataMap map;
