@@ -44,11 +44,13 @@ import java.util.function.Predicate;
  */
 public class JCollections {
 
-	/*
-	 * Creation
-	 */
+	private JCollections() {
+		// Protect default constructor.
+	}
 
-	// List creation - ArrayList //
+	/*
+	 - List creation - ArrayList
+	 */
 
 	public static <E> ArrayList<E> asArrayList(@NotNull E element) {
 		final ArrayList<E> list = new ArrayList<>();
@@ -67,7 +69,9 @@ public class JCollections {
 		return add(new ArrayList<>(), elements);
 	}
 
-	// List creation - LinkedList //
+	/*
+	 - List creation - LinkedList
+	 */
 
 	public static <E> LinkedList<E> asLinkedList(@NotNull E element) {
 		final LinkedList<E> list = new LinkedList<>();
@@ -86,7 +90,9 @@ public class JCollections {
 		return add(new LinkedList<>(), elements);
 	}
 
-	// List creation - Primitives (ArrayList) //
+	/*
+	 - List creation - Primitives
+	 */
 
 	@NotNull
 	public static List<Character> asCharList(char... chars) {
@@ -152,7 +158,9 @@ public class JCollections {
 		return list;
 	}
 
-	// Set creation - HashSet //
+	/*
+	 - Set creation - HashSet
+	 */
 
 	@NotNull
 	public static <E> HashSet<E> asHashSet(@NotNull E element) {
@@ -172,7 +180,9 @@ public class JCollections {
 		return add(new HashSet<>(), elements);
 	}
 
-	// Set creation - LinkedHashSet //
+	/*
+	 - Set creation - LinkedHashSet
+	 */
 
 	@NotNull
 	public static <E> LinkedHashSet<E> asLinkedHashSet(@NotNull E element) {
@@ -192,7 +202,9 @@ public class JCollections {
 		return add(new LinkedHashSet<>(), elements);
 	}
 
-	// Set creation - TreeSet //
+	/*
+	 - Set creation - TreeSet
+	 */
 
 	@NotNull
 	public static <E extends Comparable<C>, C> TreeSet<E> asTreeSet(@NotNull E element) {
@@ -212,7 +224,9 @@ public class JCollections {
 		return add(new TreeSet<>(), elements);
 	}
 
-	// Set creation - EnumSet //
+	/*
+	 - Set creation - EnumSet
+	 */
 
 	@NotNull
 	public static <E extends Enum<E>> EnumSet<E> asEnumSet(@NotNull Class<E> enumClass) {
@@ -237,7 +251,7 @@ public class JCollections {
 	}
 
 	/*
-	 * Collection editor
+	 - Collection editor
 	 */
 
 	@NotNull
@@ -249,10 +263,8 @@ public class JCollections {
 	}
 
 	/*
-	 * Cloning
+	 - Cloning - List
 	 */
-
-	// Cloning - List //
 
 	@NotNull
 	public static <E> List<E> clone(@NotNull List<E> list) {
@@ -270,7 +282,9 @@ public class JCollections {
 		return add(list, clone(list), filter);
 	}
 
-	// Cloning - ArrayList //
+	/*
+	 - Cloning - ArrayList
+	 */
 
 	@NotNull
 	public static <E> ArrayList<E> clone(@NotNull ArrayList<E> list) {
@@ -288,7 +302,9 @@ public class JCollections {
 		return add(list, clone(list), filter);
 	}
 
-	// Cloning - LinkedList
+	/*
+	 - Cloning - LinkedList
+	 */
 
 	@NotNull
 	public static <E> LinkedList<E> clone(@NotNull LinkedList<E> list) {
@@ -306,7 +322,9 @@ public class JCollections {
 		return add(list, clone(list), filter);
 	}
 
-	// Cloning - Set //
+	/*
+	 - Cloning - Set
+	 */
 
 	@NotNull
 	public static <E> Set<E> clone(@NotNull Set<E> set) {
@@ -324,7 +342,9 @@ public class JCollections {
 		return add(set, clone(set), filter);
 	}
 
-	// Cloning - HashSet //
+	/*
+	 - Cloning - HashSet
+	 */
 
 	@NotNull
 	public static <E> HashSet<E> clone(@NotNull HashSet<E> set) {
@@ -342,7 +362,9 @@ public class JCollections {
 		return add(set, clone(set), filter);
 	}
 
-	// Cloning - LinkedHashSet //
+	/*
+	 - Cloning - LinkedHashSet
+	 */
 
 	@NotNull
 	public static <E> LinkedHashSet<E> clone(@NotNull LinkedHashSet<E> set) {
@@ -360,7 +382,9 @@ public class JCollections {
 		return add(set, clone(set), filter);
 	}
 
-	// Cloning - TreeSet //
+	/*
+	 - Cloning - TreeSet
+	 */
 
 	@NotNull
 	public static <E extends Comparable<C>, C> TreeSet<E> clone(@NotNull TreeSet<E> set) {
@@ -379,7 +403,7 @@ public class JCollections {
 	}
 
 	/*
-	 * Addition
+	 - Addition
 	 */
 
 	@NotNull
@@ -411,7 +435,7 @@ public class JCollections {
 	}
 
 	/*
-	 * Removal
+	 - Removal
 	 */
 
 	@NotNull
@@ -442,7 +466,7 @@ public class JCollections {
 	}
 
 	/*
-	 * Mapping
+	 - Mapping
 	 */
 
 	@NotNull
@@ -459,13 +483,17 @@ public class JCollections {
 		return target;
 	}
 
-	// Mapping - Collection //
+	/*
+	 - Mapping - Collection
+	 */
 
 	public static <S, R> Collection<R> map(@NotNull Collection<S> collection, @NotNull Function<S, R> mapper) {
 		return map(collection, new ArrayList<>(collection.size()), mapper);
 	}
 
-	// Mapping - Lists //
+	/*
+	 - Mapping - Lists
+	 */
 
 	@NotNull
 	public static <S, R> List<R> map(@NotNull List<S> list, @NotNull Function<S, R> mapper) {
@@ -482,7 +510,9 @@ public class JCollections {
 		return map(list, new LinkedList<>(), mapper);
 	}
 
-	// Mapping - Sets //
+	/*
+	 - Mapping - Sets
+	 */
 
 	@NotNull
 	public static <S, R> Set<R> map(@NotNull Set<S> set, @NotNull Function<S, R> mapper) {
@@ -547,7 +577,7 @@ public class JCollections {
 	}
 
 	/*
-	 * Contains element
+	 - Contains element
 	 */
 
 	public static <E> boolean contains(@NotNull E[] array, @NotNull Predicate<E> condition) {
@@ -558,7 +588,9 @@ public class JCollections {
 		return get(iterable, condition) != null;
 	}
 
-	// Element getters - Random //
+	/*
+	 - Element getters - Random
+	 */
 
 	@Nullable
 	public static <E> E getRandom(@NotNull E[] array) {
