@@ -5,6 +5,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
 /**
@@ -23,9 +24,13 @@ public abstract class JNumbers {
 	// NOTE: For better code organization, if a method requires different primitive numeric types
 	// NOTE: We use this order: int, long, float, double. So small to big, integers to decimals.
 
+	/*
+	 - Ranges
+	 */
+
 	/**
-	 * Gets a range of <code>int</code>s between <b>from</b>
-	 * and <b>to</b>. It doesn't matter if <b>from</b> is the
+	 * Gets a range of {@code int}s between {@code from}
+	 * and {@code to}. It doesn't matter if {@code from} is the
 	 * bigger or smaller number, here are some examples:
 	 * <p>
 	 * <ul>
@@ -39,7 +44,7 @@ public abstract class JNumbers {
 	 * @param from the first number of the array.
 	 * @param to the last number of the array.
 	 * 
-	 * @return An <code>int</code> array within the defined range.
+	 * @return An {@code int} array containing the defined range.
 	 * 
 	 * @since JSky 1.0.0
 	 */
@@ -63,8 +68,8 @@ public abstract class JNumbers {
 	 * will not be complete as arrays cannot be of a length
 	 * bigger than {@link Integer#MAX_VALUE}.
 	 * <p>
-	 * Gets a range of <code>long</code>s between <b>from</b>
-	 * and <b>to</b>. It doesn't matter if <b>from</b> is the
+	 * Gets a range of {@code long}s between {@code from}
+	 * and {@code to}. It doesn't matter if {@code from} is the
 	 * bigger or smaller number, here are some examples:
 	 * <p>
 	 * <ul>
@@ -78,7 +83,7 @@ public abstract class JNumbers {
 	 * @param from the first number of the array.
 	 * @param to the last number of the array.
 	 * 
-	 * @return A <code>long</code> array within the defined range.
+	 * @return A {@code long} array containing the defined range.
 	 * 
 	 * @since JSky 1.0.0
 	 */
@@ -101,7 +106,7 @@ public abstract class JNumbers {
 	}
 
 	/*
-	 * Random
+	 - Random
 	 */
 
 	/**
@@ -109,7 +114,7 @@ public abstract class JNumbers {
 	 * This method doesn't create a new {@link Random} instance
 	 * every time it gets called, only the first time.
 	 * 
-	 * @return A never null {@link Random} instance.
+	 * @return A never {@code null} {@link Random} instance.
 	 * 
 	 * @since JSky 1.0.0
 	 */
@@ -119,87 +124,94 @@ public abstract class JNumbers {
 	}
 
 	/**
-	 * Returns either <b>one</b> or <b>two</b> randomly.
+	 * Returns either {@code a} or {@code b} randomly.
+	 * If {@code a == b}, then {@code a} is returned.
 	 * 
-	 * @param one the first number.
-	 * @param two the second number.
+	 * @param a the first number.
+	 * @param b the second number.
 	 * 
-	 * @return Either <b>one</b> or <b>two</b>.
-	 * 
-	 * @since JSky 1.0.0
-	 */
-	public static int random(int one, int two) {
-		if (one == two)
-			return one;
-		return random().nextBoolean() ? one : two;
-	}
-
-	/**
-	 * Returns either <b>one</b> or <b>two</b> randomly.
-	 * 
-	 * @param one the first number.
-	 * @param two the second number.
-	 * 
-	 * @return Either <b>one</b> or <b>two</b>.
+	 * @return Either {@code a} or {@code b}.
 	 * 
 	 * @since JSky 1.0.0
 	 */
-	public static long random(long one, long two) {
-		if (one == two)
-			return one;
-		return random().nextBoolean() ? one : two;
+	public static int random(int a, int b) {
+		if (a == b)
+			return a;
+		return random().nextBoolean() ? a : b;
 	}
 
 	/**
-	 * Returns either <b>one</b> or <b>two</b> randomly.
-	 * 
-	 * @param one the first number.
-	 * @param two the second number.
-	 * 
-	 * @return Either <b>one</b> or <b>two</b>.
-	 * 
+	 * Returns either {@code a} or {@code b} randomly.
+	 * If {@code a == b}, then {@code a} is returned.
+	 *
+	 * @param a the first number.
+	 * @param b the second number.
+	 *
+	 * @return Either {@code a} or {@code b}.
+	 *
 	 * @since JSky 1.0.0
 	 */
-	public static float random(float one, float two) {
-		if (one == two)
-			return one;
-		return random().nextBoolean() ? one : two;
+	public static long random(long a, long b) {
+		if (a == b)
+			return a;
+		return random().nextBoolean() ? a : b;
 	}
 
 	/**
-	 * Returns either <b>one</b> or <b>two</b> randomly.
-	 * 
-	 * @param one the first number.
-	 * @param two the second number.
-	 * 
-	 * @return Either <b>one</b> or <b>two</b>.
-	 * 
+	 * Returns either {@code a} or {@code b} randomly.
+	 * If {@code a == b}, then {@code a} is returned.
+	 *
+	 * @param a the first number.
+	 * @param b the second number.
+	 *
+	 * @return Either {@code a} or {@code b}.
+	 *
 	 * @since JSky 1.0.0
 	 */
-	public static double random(double one, double two) {
-		if (one == two)
-			return one;
-		return random().nextBoolean() ? one : two;
+	public static float random(float a, float b) {
+		if (a == b)
+			return a;
+		return random().nextBoolean() ? a : b;
 	}
 
 	/**
-	 * Returns either <b>one</b> or <b>two</b> randomly.
-	 * 
-	 * @param one the first number.
-	 * @param two the second number.
-	 * 
-	 * @return Either <b>one</b> or <b>two</b>.
-	 * 
+	 * Returns either {@code a} or {@code b} randomly.
+	 * If {@code a == b}, then {@code a} is returned.
+	 *
+	 * @param a the first number.
+	 * @param b the second number.
+	 *
+	 * @return Either {@code a} or {@code b}.
+	 *
+	 * @since JSky 1.0.0
+	 */
+	public static double random(double a, double b) {
+		if (a == b)
+			return a;
+		return random().nextBoolean() ? a : b;
+	}
+
+	/**
+	 * Returns either {@code a} or {@code b} randomly.
+	 * If {@link Objects#equals(Object, Object) a equals b},
+	 * then {@code a} is returned.
+	 *
+	 * @param a the first object.
+	 * @param b the second object.
+	 *
+	 * @return Either {@code a} or {@code b}.
+	 *
 	 * @since JSky 1.0.0
 	 */
 	@Nullable
-	public static <T> T random(@Nullable T one, @Nullable T two) {
-		// We don't check equality here to avoid NullPointerExceptions.
-		return random().nextBoolean() ? one : two;
+	public static <T> T random(@Nullable T a, @Nullable T b) {
+		if (Objects.equals(a, b))
+			return a;
+		return random().nextBoolean() ? a : b;
 	}
 
 	/*
-	 * Generic operations
+	 - Generic operations
 	 */
 
 	/**
@@ -218,37 +230,36 @@ public abstract class JNumbers {
 	 * value will be rounded to 1, if <b>y</b> is 1.5F, it will be rounded to 2.
 	 * <p>
 	 * <b>Limitations</b>: {@link Short} and {@link Byte} are currently not supported
-	 * as the <b>x</b> value for this method as it tries to cast to {@link Integer}
-	 * but can't, throwing a {@link ClassCastException}, this exception is prevented by
-	 * returning {@code null}, <b>y</b> on the other hand can be of any {@link Number}
-	 * class.
+	 * as the {@code a} value for this method as it tries to cast to {@link Integer}
+	 * but can't, throwing a {@link ClassCastException}. This exception is prevented by
+	 * returning {@code null}, {@code b} on the other hand can be of any {@link Number}.
 	 * 
 	 * @param <N> A class extending {@link Number} such as {@link Integer}, {@link Long},
 	 * {@link Float} or {@link Double}.
 	 * 
-	 * @param x Any number to sum with <b>y</b>, the class of this parameter will take
+	 * @param a Any number to sum with {@code b}, the class of this parameter will take
 	 * priority for casting, {@link Short} and {@link Byte} are not supported on this parameter.
-	 * @param y The number that will be summed to <b>x</b>, this one has no restrictions
-	 * other than not being {@code null}, {@link Short} and {@link Byte} are supported.
+	 * @param b The number that will be summed to {@code a}, this one has no restrictions
+	 * other than not being {@code null}. {@link Short} and {@link Byte} are supported.
 	 * 
-	 * @return The sum of both <b>x</b> and <b>y</b>, without overflowing protection,
-	 * {@code null} if <b>x</b>'s class is either {@link Short} or {@link Byte} only.
+	 * @return The sum of both {@code a} and {@code b}, without overflowing protection.
+	 * {@code null} if {@code x}'s class is either {@link Short} or {@link Byte} only.
 	 * 
-	 * @throws NullPointerException if <b>x</b> or <b>y</b> are {@code null}.
+	 * @throws NullPointerException if {@code a} or {@code b} are {@code null}.
 	 * 
 	 * @since JSky 1.0.0
 	 */
 	@Nullable
-	public static <N extends Number> N sum(@NotNull N x, @NotNull N y) {
-		final Class<?> type = x.getClass();
+	public static <N extends Number> N sum(@NotNull N a, @NotNull N b) {
+		final Class<?> type = a.getClass();
 		if (type.equals(Integer.class))
-			return (N) type.cast(x.intValue() + Math.round(y.floatValue()));
+			return (N) type.cast(a.intValue() + Math.round(b.floatValue()));
 		else if (type.equals(Long.class))
-			return (N) type.cast(x.longValue() + Math.round(y.doubleValue()));
+			return (N) type.cast(a.longValue() + Math.round(b.doubleValue()));
 		else if (type.equals(Float.class))
-			return (N) type.cast(x.floatValue() + y.floatValue());
+			return (N) type.cast(a.floatValue() + b.floatValue());
 		else if (type.equals(Double.class))
-			return (N) type.cast(x.doubleValue() + y.doubleValue());
+			return (N) type.cast(a.doubleValue() + b.doubleValue());
 		return null;
 	}
 
@@ -425,7 +436,8 @@ public abstract class JNumbers {
 			return true;
 		if (percent <= 0)
 			return false;
-		return random().nextInt(1, 101) <= percent;
+		// This makes it so percent has a percent in 100 chance to occur.
+		return random().nextInt(1, 100) <= percent;
 	}
 
 	/**
@@ -437,7 +449,7 @@ public abstract class JNumbers {
 	 * Decimal values such as 1.5, 0.1 or even 0.00001 are supported.
 	 * 
 	 * @param percent the percentage chance of returning {@code true},
-	 * for example, 50.0, will have a 50% chance of returning {@code true}.
+	 * for example, 50.0f, will have a 50% chance of returning {@code true}.
 	 * 
 	 * @return Randomly {@code true} or {@code false}, depending on the
 	 * specified <b>percent</b>.
@@ -549,7 +561,7 @@ public abstract class JNumbers {
 	public static double limit(double n, double min, double max) {
 		if (n < min)
 			return min;
-		return n > max ? max : n;
+		return Math.min(n, max);
 	}
 
 	/*
@@ -663,7 +675,6 @@ public abstract class JNumbers {
 	 */
 	@NotNull
 	public static <N extends Number> N asNumber(@NotNull CharSequence seq, @NotNull N def) {
-		@SuppressWarnings("unchecked")
 		final N number = asNumber(seq, (Class<N>) def.getClass());
 		return number == null ? def : number;
 	}
@@ -735,8 +746,8 @@ public abstract class JNumbers {
 	 * @see #asNumber(CharSequence, Class)
 	 */
 	@Nullable
-	public static <N extends Number> N asNumberFormat(@Nullable String str, @NotNull Class<N> type, @Nullable List<Character> modifiers) {
-		int len = str == null ? 0 : str.length();
+	public static <N extends Number> N asNumberFormat(@NotNull String str, @NotNull Class<N> type, @Nullable List<Character> modifiers) {
+		int len = str.length();
 		if (len <= 1 || modifiers == null)
 			return asNumber(str, type);
 		int mod = modifiers.indexOf(Character.toLowerCase(str.charAt(len - 1))) + 1;
@@ -751,7 +762,7 @@ public abstract class JNumbers {
 			for (int i = 0; i < mod + len; i++)
 				result.append(i >= len ? '0' : numStr.charAt(i));
 		} else {
-			result.append(numStr.substring(0, decIdx));
+			result.append(numStr, 0, decIdx);
 			for (int i = decIdx + 1; i <= decIdx + mod; i++)
 				result.append(i >= len ? '0' : numStr.charAt(i));
 		}
@@ -784,9 +795,9 @@ public abstract class JNumbers {
 	 *
 	 * @see #asNumber(CharSequence, Number)
 	 */
-	@Nullable
+	@NotNull
 	@SuppressWarnings("unchecked")
-	public static <N extends Number> N asNumberFormat(@Nullable String str, @NotNull N def, @Nullable List<Character> modifiers) {
+	public static <N extends Number> N asNumberFormat(@NotNull String str, @NotNull N def, @Nullable List<Character> modifiers) {
 		final Number n = asNumberFormat(str, def.getClass(), modifiers);
 		return n == null ? def : (N) n;
 	}
@@ -815,7 +826,7 @@ public abstract class JNumbers {
 	 * @see #asNumberFormat(String, Class, List)
 	 */
 	@Nullable
-	public static <N extends Number> N asNumberFormat(@Nullable String str, @NotNull Class<N> type) {
+	public static <N extends Number> N asNumberFormat(@NotNull String str, @NotNull Class<N> type) {
 		return asNumberFormat(str, type, Arrays.asList('k', 'm', 'b'));
 	}
 
@@ -843,8 +854,8 @@ public abstract class JNumbers {
 	 * @see #asNumber(CharSequence, Number)
 	 * @see #asNumberFormat(String, Number, List)
 	 */
-	@Nullable
-	public static <N extends Number> N asNumberFormat(@Nullable String str, @NotNull N def) {
+	@NotNull
+	public static <N extends Number> N asNumberFormat(@NotNull String str, @NotNull N def) {
 		return asNumberFormat(str, def, Arrays.asList('k', 'm', 'b'));
 	}
 }
