@@ -4,6 +4,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -368,6 +369,33 @@ public abstract class DataProvider {
 	@NotNull
 	public List<UUID> getUUIDs(@NotNull String key, @NotNull List<UUID> def) {
 		final List<UUID> lst = getUUIDs(key);
+		return lst == null ? def : lst;
+	}
+
+	/*
+	 - Conversion getters - Date
+	 */
+
+	@Nullable
+	public Date getDate(@NotNull String key) {
+		final Long millis = getLong(key);
+		return millis == null ? null : new Date(millis);
+	}
+
+	@NotNull
+	public Date getDate(@NotNull String key, @NotNull Date def) {
+		final Date date = getDate(key);
+		return date == null ? def : date;
+	}
+
+	@Nullable
+	public List<Date> getDates(@NotNull String key) {
+		return getDates(key, null);
+	}
+
+	@Nullable
+	public List<Date> getDates(@NotNull String key, @Nullable List<Date> def) {
+		final List<Date> lst = getDates(key);
 		return lst == null ? def : lst;
 	}
 }
