@@ -26,7 +26,7 @@ public class JStrings {
 	 *
 	 * @return {@code true} if {@code seq} has content, {@code false} otherwise.
 	 *
-	 * @since SkyUtils 1.0.0
+	 * @since JSky 1.0.0
 	 */
 	public static boolean hasContent(@Nullable CharSequence seq) {
 		if (seq == null)
@@ -68,7 +68,7 @@ public class JStrings {
 	 *
 	 * @throws NullPointerException if {@code iterable} is {@code null}.
 	 *
-	 * @since SkyUtils 1.0.0
+	 * @since JSky 1.0.0
 	 *
 	 * @see #asString(Iterable, CharSequence)
 	 */
@@ -102,7 +102,7 @@ public class JStrings {
 	 *
 	 * @throws NullPointerException if {@code iterable} is {@code null}.
 	 *
-	 * @since SkyUtils 1.0.0
+	 * @since JSky 1.0.0
 	 *
 	 * @see #asString(Iterable, CharSequence)
 	 */
@@ -133,7 +133,7 @@ public class JStrings {
 	 *
 	 * @throws NullPointerException if {@code seq} or {@code toFind} are {@code null}.
 	 *
-	 * @since SkyUtils 1.0.0
+	 * @since JSky 1.0.0
 	 */
 	public static int indexOf(@NotNull CharSequence seq, @NotNull CharSequence toFind, int beginIndex) {
 		final int seqLen = seq.length();
@@ -174,7 +174,7 @@ public class JStrings {
 	 * {@code null} if no match is found. Keep in mind that both {@code from} and {@code to}
 	 * need to be found in order to return a substring.
 	 *
-	 * @since SkyUtils 1.0.0
+	 * @since JSky 1.0.0
 	 *
 	 * @see #substring(String, CharSequence, CharSequence)
 	 */
@@ -200,7 +200,7 @@ public class JStrings {
 	 * {@code null} if no match is found. Keep in mind that both {@code from} and {@code to}
 	 * need to be found in order to return a substring.
 	 *
-	 * @since SkyUtils 1.0.0
+	 * @since JSky 1.0.0
 	 *
 	 * @see #substring(String, CharSequence, CharSequence, boolean)
 	 */
@@ -237,7 +237,7 @@ public class JStrings {
 	 *
 	 * @throws NullPointerException if any parameter is {@code null}.
 	 *
-	 * @since SkyUtils 1.0.0
+	 * @since JSky 1.0.0
 	 *
 	 * @see #match(String, CharSequence, CharSequence, Consumer)
 	 * @see #match(String, CharSequence, CharSequence, Consumer, boolean)
@@ -288,7 +288,7 @@ public class JStrings {
 	 *
 	 * @throws NullPointerException if any parameter is {@code null}.
 	 *
-	 * @since SkyUtils 1.0.0
+	 * @since JSky 1.0.0
 	 *
 	 * @see #match(String, CharSequence, CharSequence, Consumer)
 	 * @see #match(String, CharSequence, CharSequence, Function)
@@ -323,7 +323,7 @@ public class JStrings {
 	 *
 	 * @throws NullPointerException if any parameter is {@code null}.
 	 *
-	 * @since SkyUtils 1.0.0
+	 * @since JSky 1.0.0
 	 *
 	 * @see #match(String, CharSequence, CharSequence, Consumer, boolean)
 	 * @see #match(String, CharSequence, CharSequence, Function)
