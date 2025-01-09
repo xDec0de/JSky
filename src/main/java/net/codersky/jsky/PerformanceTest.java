@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 /**
  * Class used to do <b>fast</b> performance tests. Currently,
@@ -51,8 +52,8 @@ public class PerformanceTest {
 	 * @see #run(PrintStream, int)
 	 */
 	public PerformanceTest(long amount, long sleep) {
-		this.amount = amount < 1 ? 1 : amount;
-		this.sleep = sleep < 1 ? 1 : sleep;
+		this.amount = amount <= 0 ? 1 : amount;
+		this.sleep = sleep <= 0 ? 1 : sleep;
 	}
 
 	/**
@@ -80,6 +81,30 @@ public class PerformanceTest {
 	/**
 	 * Runs all tasks stored on this {@link PerformanceTest} the specified
 	 * amount of {@code times}, printing test details as well as minimum, average
+	 * and maximum results with the provided {@code printAction}.
+	 *
+	 * @param printAction A {@link Consumer} that will {@link Consumer#accept(Object) accept} any
+	 * String to be printed by the {@link PerformanceTest}.
+	 * @param times the amount of times to repeat this {@link PerformanceTest}, test
+	 * execution will run on a separate thread but not multiple threads, must be higher or
+	 * equal to 1.
+	 *
+	 * @return This {@link PerformanceTest}
+	 *
+	 * @since JSky 1.0.0
+	 */
+	@NotNull
+	public PerformanceTest run(@NotNull Consumer<String> printAction, int times) {
+		final int checkedTimes = Math.max(times, 1);
+		printAction.accept("Starting performance test (Repeat: "+checkedTimes+" | Amount: "+amount+" | Sleep: "+sleep+")");
+		printAction.accept(" ");
+		new PerformanceTestThread(printAction, checkedTimes).start();
+		return this;
+	}
+
+	/**
+	 * Runs all tasks stored on this {@link PerformanceTest} the specified
+	 * amount of {@code times}, printing test details as well as minimum, average
 	 * and maximum results on {@code stream}.
 	 * 
 	 * @param stream the stream to print all information, normally {@link System#out}
@@ -93,20 +118,16 @@ public class PerformanceTest {
 	 */
 	@NotNull
 	public PerformanceTest run(@NotNull PrintStream stream, int times) {
-		final int checkedTimes = Math.max(times, 1);
-		stream.println("Starting performance test (Repeat: "+checkedTimes+" | Amount: "+amount+" | Sleep: "+sleep+")");
-		stream.println(" ");
-		new PerformanceTestThread(stream, checkedTimes).start();
-		return this;
+		return run(stream::println, times);
 	}
 
 	class PerformanceTestThread extends Thread {
 
-		private final PrintStream stream;
+		private final Consumer<String> printAction;
 		private final long times;
 
-		PerformanceTestThread(PrintStream stream, long repeat) {
-			this.stream = stream;
+		PerformanceTestThread(@NotNull Consumer<String> printAction, long repeat) {
+			this.printAction = printAction;
 			this.times = repeat;
 		}
 
@@ -121,9 +142,10 @@ public class PerformanceTest {
 						final long start = threadMx.getCurrentThreadCpuTime(); // Getting actual CPU time used by this thread
 						for (int j = 0; j < amount; j++)
 							runnable.run(); // Calling the method itself
-						final long total = Math.round((threadMx.getCurrentThreadCpuTime() - start) / 1000000);
+						final long total = Math.round((float) (threadMx.getCurrentThreadCpuTime() - start) / 1000000);
 						results.get(id).add(total);
 					} catch (InterruptedException | IllegalArgumentException e) {
+						printAction.accept("Failed to run performance test: " + e.getMessage());
 						e.printStackTrace();
 					}
 				});
@@ -143,7 +165,7 @@ public class PerformanceTest {
 						max = time;
 					sum += time;
 				}
-				stream.println(id+" - Min: " + min + "ms | Average: "+ (sum / resultList.size()) +"ms | Max: " + max+"ms");
+				printAction.accept(id + " - Min: " + min + "ms | Average: "+ (sum / resultList.size()) +"ms | Max: " + max+"ms");
 			});
 		}
 	}
