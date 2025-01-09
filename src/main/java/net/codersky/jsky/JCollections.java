@@ -477,7 +477,7 @@ public class JCollections {
 	}
 
 	@NotNull
-	public static <S extends Collection<O>, T extends Collection<R>, O, R> T map(@NotNull S src, T target, @NotNull Function<O, R> mapper) {
+	public static <S extends Collection<O>, T extends Collection<R>, O, R> T map(@NotNull S src, @NotNull T target, @NotNull Function<O, R> mapper) {
 		for (O element : src)
 			target.add(mapper.apply(element));
 		return target;
@@ -487,6 +487,7 @@ public class JCollections {
 	 - Mapping - Collection
 	 */
 
+	@NotNull
 	public static <S, R> Collection<R> map(@NotNull Collection<S> collection, @NotNull Function<S, R> mapper) {
 		return map(collection, new ArrayList<>(collection.size()), mapper);
 	}
@@ -539,7 +540,7 @@ public class JCollections {
 	 */
 
 	@Nullable
-	public static <E> E get(@NotNull E[] array, @NotNull Predicate<E> condition) {
+	public static <E> E get(@Nullable E @NotNull [] array, @NotNull Predicate<E> condition) {
 		for (E element : array)
 			if (condition.test(element))
 				return element;
@@ -547,7 +548,7 @@ public class JCollections {
 	}
 
 	@NotNull
-	public static <E> E get(@NotNull E[] array, @NotNull Predicate<E> condition, @NotNull E def) {
+	public static <E> E get(@Nullable E @NotNull [] array, @NotNull Predicate<E> condition, @NotNull E def) {
 		final E element = get(array, condition);
 		return element == null ? def : element;
 	}
@@ -566,6 +567,7 @@ public class JCollections {
 		return element == null ? def : element;
 	}
 
+	@Nullable
 	public static <E> E get(@NotNull Iterable<E> iterable, int index) {
 		int i = index;
 		for (E element : iterable) {
@@ -580,7 +582,7 @@ public class JCollections {
 	 - Contains element
 	 */
 
-	public static <E> boolean contains(@NotNull E[] array, @NotNull Predicate<E> condition) {
+	public static <E> boolean contains(@Nullable E @NotNull [] array, @NotNull Predicate<E> condition) {
 		return get(array, condition) != null;
 	}
 
@@ -593,7 +595,7 @@ public class JCollections {
 	 */
 
 	@Nullable
-	public static <E> E getRandom(@NotNull E[] array) {
+	public static <E> E getRandom(@Nullable E @NotNull [] array) {
 		return array[JNumbers.random().nextInt(0, array.length)];
 	}
 
