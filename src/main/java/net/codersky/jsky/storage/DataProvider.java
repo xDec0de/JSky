@@ -51,7 +51,7 @@ public abstract class DataProvider {
 	 * @return the <b>internal</b> {@link DataMap} that this
 	 * {@link DataProvider} is using.
 	 *
-	 * @since SkyUtils 1.0.0
+	 * @since JSky 1.0.0
 	 */
 	@NotNull
 	@ApiStatus.Internal
@@ -101,7 +101,7 @@ public abstract class DataProvider {
 	 * @return The {@link Set} of keys that are currently
 	 * cached on this {@link DataProvider}.
 	 *
-	 * @since SkyUtils 1.0.0
+	 * @since JSky 1.0.0
 	 *
 	 * @see #containsKey(String...)
 	 */
@@ -132,7 +132,7 @@ public abstract class DataProvider {
 	 *
 	 * @throws NullPointerException if {@code key} is {@code null}.
 	 *
-	 * @since SkyUtils 1.0.0
+	 * @since JSky 1.0.0
 	 */
 	@Nullable
 	public String getString(@NotNull String key) {
