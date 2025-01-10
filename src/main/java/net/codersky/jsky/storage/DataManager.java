@@ -1,6 +1,6 @@
 package net.codersky.jsky.storage;
 
-import net.codersky.jsky.JCollections;
+import net.codersky.jsky.collections.JCollections;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Date;
