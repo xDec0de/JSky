@@ -393,4 +393,33 @@ public class JStrings {
 		}
 		return UUID.fromString(builder.toString());
 	}
+
+	/*
+	 - Hexadecimal string conversion
+	 */
+
+	/**
+	 * Converts the provided array of {@code byte}s to a hexadecimal {@link String}.
+	 *
+	 * @param bytes The array of {@code byte}s to convert.
+	 *
+	 * @return A hexadecimal {@link String} based of the provided {@code bytes} array.
+	 *
+	 * @throws NullPointerException if {@code bytes} is {@code null}.
+	 *
+	 * @since JSky 1.0.0
+	 */
+	@NotNull
+	public static String toHexString(byte @NotNull [] bytes) {
+		final StringBuilder hexStr = new StringBuilder(2 * bytes.length);
+		for (final byte b : bytes) {
+			final String hex = Integer.toHexString(0xff & b);
+			hexStr.append(hex.length() == 1 ? '0' : hex);
+		}
+		return hexStr.toString();
+	}
+
+	public static String sha256(@NotNull String str) {
+		return hexDigest(str, "SHA3-256");
+	}
 }
