@@ -8,7 +8,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -533,5 +532,21 @@ public class JStrings {
 	@Nullable
 	public static String sha3_256(@NotNull String str) {
 		return hexDigest(str, "SHA3-256");
+	}
+
+	/**
+	 * Hashes the provided {@code str}ing with the <b>MD5</b> algorithm.
+	 *
+	 * @param str The {@link String} to hash.
+	 *
+	 * @return An <b>almost</b> never {@code null} hexadecimal {@link String}, containing
+	 * the MD5 hash calculated from the source {@code str}. {@code null} if for
+	 * whatever reason the MD5 algorithm isn't found (Should never happen).
+	 *
+	 * @since JSky 1.0.0
+	 */
+	@Nullable
+	public static String md5(@NotNull String str) {
+		return hexDigest(str, "MD5");
 	}
 }
