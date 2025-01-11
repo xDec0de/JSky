@@ -3,8 +3,12 @@ package net.codersky.jsky.strings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -419,7 +423,115 @@ public class JStrings {
 		return hexStr.toString();
 	}
 
-	public static String sha256(@NotNull String str) {
+	/*
+	 - MessageDigest
+	 */
+
+	/**
+	 * Safely returns a {@link MessageDigest} object that implements the specified digest algorithm.
+	 * See {@link MessageDigest#getInstance(String)} for more details. This method just catches the
+	 * {@link NoSuchAlgorithmException} for you and returns {@code null} in case it is thrown.
+	 *
+	 * @param algorithm The name of the algorithm to search for.
+	 *
+	 * @return A {@link MessageDigest} object that implements the specified digest algorithm.
+	 * {@code null} if no algorithm matches the provided {@code algorithm} name.
+	 *
+	 * @throws NullPointerException If {@code algorithm} is {@code null}.
+	 *
+	 * @since JSky 1.0.0
+	 *
+	 * @see MessageDigest#getInstance(String)
+	 */
+	@Nullable
+	public static MessageDigest getMessageDigest(@NotNull String algorithm) {
+		try {
+			return MessageDigest.getInstance(algorithm);
+		} catch (NoSuchAlgorithmException e) {
+			return null;
+		}
+	}
+
+	/**
+	 * Converts the provided {@link String} to a {@code byte} array, using
+	 * the specified {@code algorithm}. The {@link MessageDigest algorithm} is
+	 * obtained with {@link MessageDigest#getInstance(String)}.
+	 *
+	 * @param str The {@code String} to convert.
+	 * @param algorithm The {@link MessageDigest algorithm} to use, see
+	 * {@link MessageDigest#getInstance(String)} for more details.
+	 *
+	 * @return The resulting {@code byte} array. {@code null} if the {@code algorithm} isn't found.
+	 *
+	 * @throws NullPointerException If either {@code str} or {@code algorithm} are {@code null}.
+	 *
+	 * @since JSky 1.0.0
+	 *
+	 * @see MessageDigest#getInstance(String)
+	 */
+	public static byte @Nullable [] digest(@NotNull String str, @NotNull String algorithm) {
+		final MessageDigest digest = getMessageDigest(algorithm);
+		return digest == null ? null : digest.digest(str.getBytes(StandardCharsets.UTF_8));
+	}
+
+	/**
+	 * Converts the provided {@code str}ing to a {@code byte} array using the specified
+	 * {@code algorithm} with {@link #digest(String, String)}. Then the resulting array
+	 * is converted to a hexadecimal {@link String} with {@link #toHexString(byte[])}.
+	 *
+	 * @param str The {@link String} to process.
+	 * @param algorithm The {@link MessageDigest algorithm} to use, see
+	 * {@link MessageDigest#getInstance(String)} for more details.
+	 *
+	 * @return The resulting {@code byte} array processed by the {@code algorithm}, then
+	 * converted to a hexadecimal {@link String}. {@code null} if the provided
+	 * {@code algorithm} isn't found.
+	 *
+	 * @throws NullPointerException If either {@code str} or {@code algorithm} are {@code null}.
+	 *
+	 * @since JSky 1.0.0
+	 */
+	@Nullable
+	public static String hexDigest(@NotNull String str, @NotNull String algorithm) {
+		final byte[] bytes = digest(str, algorithm);
+		return bytes == null ? null : toHexString(bytes);
+	}
+
+	/**
+	 * Converts the provided {@code str}ing to a {@code byte} array using the specified
+	 * {@code algorithm} with {@link #digest(String, String)}. Then the resulting array
+	 * is converted to a hexadecimal {@link String} with {@link #toHexString(byte[])}.
+	 *
+	 * @param str The {@link String} to process.
+	 * @param algorithm The {@link MessageDigest algorithm} to use, see
+	 * {@link MessageDigest#getInstance(String)} for more details.
+	 *
+	 * @return The resulting {@code byte} array processed by the {@code algorithm}, then
+	 * converted to a hexadecimal {@link String}. {@code null} if the provided
+	 * {@code algorithm} isn't found.
+	 *
+	 * @throws NullPointerException If either {@code str} or {@code algorithm} are {@code null}.
+	 *
+	 * @since JSky 1.0.0
+	 */
+	@NotNull
+	public static String hexDigest(@NotNull String str, @NotNull MessageDigest algorithm) {
+		return toHexString(algorithm.digest(str.getBytes(StandardCharsets.UTF_8)));
+	}
+
+	/**
+	 * Hashes the provided {@code str}ing with the <b>SHA3-256</b> algorithm.
+	 *
+	 * @param str The {@link String} to hash.
+	 *
+	 * @return An <b>almost</b> never {@code null} hexadecimal {@link String}, containing
+	 * the SHA3-256 hash calculated from the source {@code str}. {@code null} if for
+	 * whatever reason the SHA3-256 algorithm isn't found (Should never happen).
+	 *
+	 * @since JSky 1.0.0
+	 */
+	@Nullable
+	public static String sha3_256(@NotNull String str) {
 		return hexDigest(str, "SHA3-256");
 	}
 }
