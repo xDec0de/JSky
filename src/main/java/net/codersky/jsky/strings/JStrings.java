@@ -3,6 +3,7 @@ package net.codersky.jsky.strings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -414,12 +415,7 @@ public class JStrings {
 	 */
 	@NotNull
 	public static String toHexString(byte @NotNull [] bytes) {
-		final StringBuilder hexStr = new StringBuilder(2 * bytes.length);
-		for (final byte b : bytes) {
-			final String hex = Integer.toHexString(0xff & b);
-			hexStr.append(hex.length() == 1 ? '0' : hex);
-		}
-		return hexStr.toString();
+		return new BigInteger(1, bytes).toString(16);
 	}
 
 	/*
