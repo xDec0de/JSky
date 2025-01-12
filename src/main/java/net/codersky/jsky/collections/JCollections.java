@@ -1,6 +1,9 @@
 package net.codersky.jsky.collections;
 
 import net.codersky.jsky.JNumbers;
+import net.codersky.jsky.predicate.BytePredicate;
+import net.codersky.jsky.predicate.FloatPredicate;
+import net.codersky.jsky.predicate.ShortPredicate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,7 +18,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Consumer;
+import java.util.function.DoublePredicate;
 import java.util.function.Function;
+import java.util.function.IntPredicate;
+import java.util.function.LongPredicate;
 import java.util.function.Predicate;
 
 /**
@@ -580,15 +586,61 @@ public class JCollections {
 	}
 
 	/*
-	 - Contains element
+	 - Contains element - Generic
 	 */
+
+	public static <E> boolean contains(@NotNull Iterable<E> iterable, @NotNull Predicate<E> condition) {
+		return get(iterable, condition) != null;
+	}
 
 	public static <E> boolean contains(@Nullable E @NotNull [] array, @NotNull Predicate<E> condition) {
 		return get(array, condition) != null;
 	}
 
-	public static <E> boolean contains(@NotNull Iterable<E> iterable, @NotNull Predicate<E> condition) {
-		return get(iterable, condition) != null;
+	/*
+	 - Contains element - Array primitives
+	 */
+
+	public static boolean contains(byte @NotNull [] array, @NotNull BytePredicate condition) {
+		for (final byte b : array)
+			if (!condition.test(b))
+				return false;
+		return true;
+	}
+
+	public static boolean contains(short @NotNull [] array, @NotNull ShortPredicate condition) {
+		for (final short s : array)
+			if (!condition.test(s))
+				return false;
+		return true;
+	}
+
+	public static boolean contains(int @NotNull [] array, @NotNull IntPredicate condition) {
+		for (final int i : array)
+			if (!condition.test(i))
+				return false;
+		return true;
+	}
+
+	public static boolean contains(long @NotNull [] array, @NotNull LongPredicate condition) {
+		for (final long l : array)
+			if (!condition.test(l))
+				return false;
+		return true;
+	}
+
+	public static boolean contains(int @NotNull [] array, @NotNull FloatPredicate condition) {
+		for (final float f : array)
+			if (!condition.test(f))
+				return false;
+		return true;
+	}
+
+	public static boolean contains(long @NotNull [] array, @NotNull DoublePredicate condition) {
+		for (final double d : array)
+			if (!condition.test(d))
+				return false;
+		return true;
 	}
 
 	/*
