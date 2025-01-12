@@ -536,6 +536,10 @@ public class JStrings {
 
 	/**
 	 * Hashes the provided {@code str}ing with the <b>MD5</b> algorithm.
+	 * <p>
+	 * <b>Note</b>: Keep in mind that the MD5 algorithm is considered to be cryptographically
+	 * broken, vulnerable to hash collisions. For security purposes, you are better
+	 * off with {@link #sha3_256(String)}.
 	 *
 	 * @param str The {@link String} to hash.
 	 *
