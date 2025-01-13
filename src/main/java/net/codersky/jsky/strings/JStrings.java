@@ -2,6 +2,7 @@ package net.codersky.jsky.strings;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Range;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -399,8 +400,47 @@ public class JStrings {
 	}
 
 	/*
-	 - Hexadecimal string conversion
+	 - Byte array to String conversion
 	 */
+
+	/**
+	 * Converts the provided array of {@code byte}s to a {@link String} in the given {@code radix}.
+	 * For example, a {@code radix} of 16 will result in a hexadecimal {@link String}, though
+	 * {@link #toHexString(byte[])} can be used instead.
+	 *
+	 * @param bytes The array of {@code byte}s to convert.
+	 * @param radix The radix of the String representation.
+	 * Must be between {@link Character#MIN_RADIX} and {@link Character#MAX_RADIX}
+	 *
+	 * @return A {@link String} in the given {@code radix} based of the provided {@code bytes} array.
+	 *
+	 * @since JSky 1.0.0
+	 *
+	 * @see #toString(byte[])
+	 * @see #toHexString(byte[])
+	 */
+	@NotNull
+	public static String toString(byte @NotNull [] bytes, @Range(from = Character.MIN_RADIX, to = Character.MAX_RADIX) int radix) {
+		return new BigInteger(1, bytes).toString(radix);
+	}
+
+	/**
+	 * Converts the provided array of {@code byte}s to a decimal {@link String}.
+	 *
+	 * @param bytes The array of {@code byte}s to convert.
+	 *
+	 * @return A decimal {@link String} based of the provided {@code bytes} array.
+	 *
+	 * @throws NullPointerException if {@code bytes} is {@code null}.
+	 *
+	 * @since JSky 1.0.0
+	 *
+	 * @see #toString(byte[], int)
+	 */
+	@NotNull
+	public static String toString(byte @NotNull [] bytes) {
+		return toString(bytes, 10);
+	}
 
 	/**
 	 * Converts the provided array of {@code byte}s to a hexadecimal {@link String}.
@@ -412,10 +452,12 @@ public class JStrings {
 	 * @throws NullPointerException if {@code bytes} is {@code null}.
 	 *
 	 * @since JSky 1.0.0
+	 * 
+	 * @see #toString(byte[], int)
 	 */
 	@NotNull
 	public static String toHexString(byte @NotNull [] bytes) {
-		return new BigInteger(1, bytes).toString(16);
+		return toString(bytes, 16);
 	}
 
 	/*
