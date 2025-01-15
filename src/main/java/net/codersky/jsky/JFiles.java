@@ -1,8 +1,10 @@
 package net.codersky.jsky;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.util.function.Consumer;
 
@@ -62,5 +64,49 @@ public class JFiles {
 	 */
 	public static boolean create(@NotNull File file) {
 		return create(file, Exception::printStackTrace);
+	}
+
+	/**
+	 * Removes all files that match the provided {@code filter} inside a {@code directory}.
+	 *
+	 * @param directory The directory to remove all files that match the {@code filter} from.
+	 * @param recursive Whether to enable recursive mode or not. With recursive mode, all
+	 * directories inside the specified {@code directory} will also be cleared and then removed.
+	 * @param filter The {@link FileFilter} to apply before deleting files, files that return
+	 * {@code false} on this {@link FileFilter} won't be removed. If {@code null}, no filter
+	 * will be applied and all files will be removed.
+	 *
+	 * @return {@code true} if all files were deleted successfully, {@code false} otherwise.
+	 *
+	 * @since JSky 1.0.0
+	 */
+	public static boolean removeContents(@NotNull File directory, boolean recursive, @Nullable FileFilter filter) {
+		final File[] files = directory.listFiles(filter);
+		if (files == null)
+			return false;
+		int errors = 0;
+		for (final File file : files) {
+			if (recursive && file.isDirectory()) {
+				if (!removeContents(file, true, filter))
+					errors++;
+			} else if (!file.delete())
+				errors++;
+		}
+		return errors == 0;
+	}
+
+	/**
+	 * Removes all files inside a {@code directory}.
+	 *
+	 * @param directory The directory to remove all files from.
+	 * @param recursive Whether to enable recursive mode or not. With recursive mode, all
+	 * directories inside the specified {@code directory} will also be cleared and then removed.
+	 *
+	 * @return {@code true} if all files were deleted successfully, {@code false} otherwise.
+	 *
+	 * @since JSky 1.0.0
+	 */
+	public static boolean removeContents(@NotNull File directory, boolean recursive) {
+		return removeContents(directory, recursive, null);
 	}
 }
