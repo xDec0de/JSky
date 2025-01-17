@@ -248,4 +248,41 @@ public class DataMap {
 			source.put(actualKey, new LinkedList<>(value));
 		return value;
 	}
+
+	/*
+	 - Updating
+	 */
+
+	private boolean isIgnored(String path, @Nullable List<String> ignored) {
+		if (ignored == null)
+			return false;
+		for (String ignoredPath : ignored)
+			if (path.startsWith(ignoredPath))
+				return true;
+		return false;
+	}
+
+	public boolean update(@NotNull HashMap<String, Object> updatedMap, @Nullable List<String> ignored) {
+		int changes = 0;
+		final HashMap<String, Object> internalMap = getInternalMap();
+		// Add new keys
+		for (Map.Entry<String, Object> entry : updatedMap.entrySet()) {
+			if (!internalMap.containsKey(entry.getKey()) && !isIgnored(entry.getKey(), ignored)) {
+				internalMap.put(entry.getKey(), entry.getValue());
+				changes++;
+			}
+		}
+		// Remove old keys
+		for (Map.Entry<String, Object> entry : internalMap.entrySet()) {
+			if (!updatedMap.containsKey(entry.getKey()) && !isIgnored(entry.getKey(), ignored)) {
+				internalMap.remove(entry.getKey());
+				changes++;
+			}
+		}
+		return changes != 0;
+	}
+
+	public boolean update(@NotNull DataMap updatedMap, @Nullable List<String> ignored) {
+		return update(updatedMap.getInternalMap(), ignored);
+	}
 }
