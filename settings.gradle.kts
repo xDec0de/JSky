@@ -7,3 +7,6 @@ dependencyResolutionManagement {
 		}
 	}
 }
+
+include("base")
+include("yaml")
