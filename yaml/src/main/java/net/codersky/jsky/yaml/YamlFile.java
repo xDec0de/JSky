@@ -163,12 +163,18 @@ public class YamlFile extends DataManager implements Reloadable {
 
 	@Override
 	public boolean equals(@Nullable Object obj) {
-		return obj instanceof final YamlFile other && other.getMap().equals(this.getMap());
+		final YamlFile other;
+		if (obj == null || !YamlFile.class.isAssignableFrom(obj.getClass()))
+			return false;
+		other = (YamlFile) obj;
+		return other.resourcePath.equals(this.resourcePath)
+				&& other.file.equals(this.file) && other.loader.equals(this.loader)
+				&& other.yaml.equals(this.yaml) && other.getMap().equals(this.getMap());
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(getMap());
+		return Objects.hash(resourcePath, file, loader, yaml, getMap());
 	}
 
 	@Override
