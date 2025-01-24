@@ -20,6 +20,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * {@link DataManager} for {@link Yaml} files implementing the {@link Reloadable} {@code interface}.
+ * <p>
+ * A {@link YamlFile} has two paths that are used internally. For clarification purposes,
+ * we will refer to the path used to obtain the
+ * {@link ClassLoader#getResourceAsStream(String) resource} of this file as the
+ * <b>resource path</b>. This is (generally) the path where your default yaml file
+ * is located inside your jar file. The <b>disk path</b> on the other hand, is where
+ * the actual file will be saved for the end user.
+ * <p>
+ * Let's see a practical example. If you have a file named "config.yml" on your jar's
+ * resources, but you want it to be stored inside the "path/to/files" folder for the end user,
+ * then the <b>disk path</b> will be {@code new File("path/to/files")}, and the <b>resource</b>
+ * path will just be "config.yml".
+ *
+ * @since JSky 1.0.0
+ *
+ * @see #YamlFile(ClassLoader, File, String)
+ * @see #setup()
+ * @see #save()
+ * @see #update(List)
+ */
 public class YamlFile extends DataManager implements Reloadable {
 
 	protected final ClassLoader loader;
@@ -27,16 +49,63 @@ public class YamlFile extends DataManager implements Reloadable {
 	protected final File file;
 	protected final String resourcePath;
 
-	public YamlFile(@NotNull ClassLoader loader, @Nullable File parent, @NotNull String path) {
+	/**
+	 * Creates a new {@link YamlFile} with the provided {@link ClassLoader loader},
+	 * {@code diskPath} {@link File} and {@code resourcePath}.
+	 * <p>
+	 * A detailed explanation about the {@code diskPath} and {@code resourcePath} parameters
+	 * can be found at {@link YamlFile}. Understanding what the <b>resource path</b>
+	 * and <b>disk path</b> are is essential to use {@link YamlFile yaml files}.
+	 *
+	 * @param loader The {@link ClassLoader} used to obtain the {@link #getUpdatedStream() updated
+	 * stream} to {@link #update() update} the file. In other words, the {@link ClassLoader}
+	 * that contains the {@link ClassLoader#getResourceAsStream(String) resource} of this file.
+	 *
+	 * @param diskPath The {@link Nullable} {@link File} that will be combined with the
+	 * provided {@code resourcePath} to {@link File#File(File, String) create} the <b>disk path</b>
+	 * {@link #asFile() file} of this {@link YamlFile}. This parameter may be {@code null} if
+	 * the <b>resource path</b> is the same as the <b>disk path</b>.
+	 *
+	 * @param resourcePath The <b>resource path</b>. If you want this file to be
+	 * {@link #update() updated}, this path must point to a valid resource on the {@code loader}.
+	 *
+	 * @since JSky 1.0.0
+	 *
+	 * @see YamlFile
+	 * @see #YamlFile(File, String)
+	 */
+	public YamlFile(@NotNull ClassLoader loader, @Nullable File diskPath, @NotNull String resourcePath) {
 		super(new DataMap(true));
 		this.loader = Objects.requireNonNull(loader);
 		this.yaml = getNewYaml();
-		this.file = new File(parent, path);
-		this.resourcePath = path;
+		this.file = new File(diskPath, resourcePath);
+		this.resourcePath = resourcePath;
 	}
 
-	public YamlFile(@Nullable File parent, @NotNull String path) {
-		this(ClassLoader.getPlatformClassLoader(), parent, path);
+	/**
+	 * Creates a new {@link YamlFile} with the provided {@code diskPath} {@link File}
+	 * and {@code resourcePath}. The {@link ClassLoader} used is
+	 * {@link Thread#getContextClassLoader()} on {@link Thread#currentThread()}.
+	 * <p>
+	 * A detailed explanation about the {@code diskPath} and {@code resourcePath} parameters
+	 * can be found at {@link YamlFile}. Understanding what the <b>resource path</b>
+	 * and <b>disk path</b> are is essential to use {@link YamlFile yaml files}.
+	 *
+	 * @param diskPath The {@link Nullable} {@link File} that will be combined with the
+	 * provided {@code resourcePath} to {@link File#File(File, String) create} the <b>disk path</b>
+	 * {@link #asFile() file} of this {@link YamlFile}. This parameter may be {@code null} if
+	 * the <b>resource path</b> is the same as the <b>disk path</b>.
+	 *
+	 * @param resourcePath The <b>resource path</b>. If you want this file to be
+	 * {@link #update() updated}, this path must point to a valid resource on the {@code loader}.
+	 *
+	 * @since JSky 1.0.0
+	 *
+	 * @see YamlFile
+	 * @see #YamlFile(ClassLoader, File, String)
+	 */
+	public YamlFile(@Nullable File diskPath, @NotNull String resourcePath) {
+		this(Thread.currentThread().getContextClassLoader(), diskPath, resourcePath);
 	}
 
 	/*
@@ -68,21 +137,71 @@ public class YamlFile extends DataManager implements Reloadable {
 	 - File handling
 	 */
 
+	/**
+	 * Gets the internal {@link File} instance of this {@link YamlFile}.
+	 * This {@link File} points to the path <b>on disk</b>, not the
+	 * {@link #getUpdatedStream() resource}.
+	 *
+	 * @return The internal {@link File} instance of this {@link YamlFile}.
+	 *
+	 * @since JSky 1.0.0
+	 */
 	@NotNull
 	public File asFile() {
 		return file;
 	}
 
+	/**
+	 * Checks if this {@link YamlFile} exists on disk.
+	 * This is just a call to {@link File#exists()} using {@link #asFile()}.
+	 *
+	 * @throws SecurityException Details specified on {@link File#exists()}.
+	 *
+	 * @return {@code true} if this {@link YamlFile} exists on disk, {@code false} otherwise.
+	 *
+	 * @since JSky 1.0.0
+	 */
 	public boolean exists() {
 		return file.exists();
 	}
 
+	/**
+	 * Does any necessary tasks for this file to be effectively usable.
+	 * This method has two possible paths:
+	 * <p>
+	 * If the already {@link #exists() exists}, it will just be {@link #reload() reloaded}.
+	 * <p>
+	 * If the file doesn't {@link #exists() exist}, it will first be
+	 * {@link JFiles#create(File) created}, then {@link #update() updated} and
+	 * {@link #save() saved} to write any contents from the resource file to it.
+	 *
+	 * @return {@code true} if every setup action succeeded, {@code false} otherwise.
+	 *
+	 * @since JSky 1.0.0
+	 */
 	public boolean setup() {
 		if (exists())
 			return reload();
 		return JFiles.create(file) && update() && save();
 	}
 
+	/**
+	 * Saves the <b>cached</b> contents of this {@link YamlFile} to disk.
+	 * If the internal {@link DataMap cache} hasn't been modified, nothing
+	 * will be done. If the file doesn't {@link #exists() exist}, this method
+	 * will attempt to {@link JFiles#create(File) create} it, checking if it
+	 * was able to do so.
+	 * <p>
+	 * Keep in mind that if you save the file before {@link #reload() loading}
+	 * it, the result will be an empty file, loosing any contents on it.
+	 *
+	 * @return {@code true} if the file was saved successfully. {@code false}
+	 * otherwise. {@code false} could indicate that the file doesn't
+	 * {@link #exists() exist} and couldn't be created or that an {@link IOException}
+	 * occurred when trying to write the contents to the existing file.
+	 *
+	 * @since JSky 1.0.0
+	 */
 	public boolean save() {
 		if (!getMap().isModified())
 			return true;
@@ -103,6 +222,15 @@ public class YamlFile extends DataManager implements Reloadable {
 	 - Reloadable implementation
 	 */
 
+	/**
+	 * Reloads this {@link YamlFile}, reading the contents of the file on disk
+	 * to cache them into the internal {@link DataMap}.
+	 *
+	 * @return {@code true} upon a successful reload, {@code false} only if an
+	 * {@link Exception} is thrown.
+	 *
+	 * @since JSky 1.0.0
+	 */
 	public boolean reload() {
 		try {
 			getMap().clear();
@@ -126,18 +254,34 @@ public class YamlFile extends DataManager implements Reloadable {
 	 * only the {@code path} without the parent {@link File} to
 	 * {@link ClassLoader#getResourceAsStream(String) get the resource}.
 	 * The return value of this method directly affects {@link #update(List)},
-	 * as this is the {@link InputStream} that said method will compare against, if
-	 * {@code null}, the file won't update.
+	 * as this is the {@link InputStream} that said method will compare against.
+	 * If {@code null}, the file won't update.
 	 *
 	 * @return The updated {@link InputStream} of this {@link YamlFile}.
 	 *
 	 * @since JSky 1.0.0
 	 */
 	@Nullable
-	protected InputStream getUpdatedStream() {
+	public InputStream getUpdatedStream() {
 		return loader.getResourceAsStream(resourcePath);
 	}
 
+	/**
+	 * Updates this {@link YamlFile}, comparing its <b>cached</b> contents to those
+	 * on the {@link #getUpdatedStream() updated} {@link InputStream}. This method
+	 * relies on {@link DataMap#update(HashMap, List)}. Details are provided there.
+	 * <p>
+	 * The file will only be {@link #save() saved} if necessary.
+	 *
+	 * @param ignored The list of paths to ignore. Ignored paths won't be affected
+	 * and will remain unchanged. See {@link DataMap#update(HashMap, List)} for details.
+	 *
+	 * @return {@code true} if the update was successful, {@code false} if
+	 * {@link #getUpdatedStream()} returns {@code null} or any exceptions occur
+	 * during the process.
+	 *
+	 * @since JSky 1.0.0
+	 */
 	public boolean update(@Nullable List<String> ignored) {
 		final InputStream updated = getUpdatedStream();
 		if (updated == null)
@@ -153,6 +297,21 @@ public class YamlFile extends DataManager implements Reloadable {
 		}
 	}
 
+	/**
+	 * Updates this {@link YamlFile}, comparing its <b>cached</b> contents to those
+	 * on the {@link #getUpdatedStream() updated} {@link InputStream}. This method
+	 * relies on {@link DataMap#update(HashMap, List)}. Details are provided there.
+	 * <p>
+	 * The file will only be {@link #save() saved} if necessary.
+	 * <p>
+	 * This method is equivalent to {@code update(null)}.
+	 *
+	 * @return {@code true} if the update was successful, {@code false} if
+	 * {@link #getUpdatedStream()} returns {@code null} or any exceptions occur
+	 * during the process.
+	 *
+	 * @since JSky 1.0.0
+	 */
 	public boolean update() {
 		return update(null);
 	}
