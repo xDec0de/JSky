@@ -43,8 +43,22 @@ public class YamlFile extends DataManager implements Reloadable {
 	 - SnakeYaml utilities
 	 */
 
+	/**
+	 * Method used to generate a new {@link Yaml} instance.
+	 * This is the instance that is used internally in order to
+	 * {@link #reload()} and {@link #save()} the file. You may
+	 * override this method to use your own configuration.
+	 * <p>
+	 * By default, this method will just create a new {@link Yaml}
+	 * with the default flow style set to {@link DumperOptions.FlowStyle#BLOCK}
+	 *
+	 * @return A new {@link Yaml} instance. Must not be {@code null},
+	 * otherwise, trying to use this {@link YamlFile} will throw exceptions.
+	 *
+	 * @since JSky 1.0.0
+	 */
 	@NotNull
-	private Yaml getNewYaml() {
+	protected Yaml getNewYaml() {
 		final DumperOptions dumperOptions = new DumperOptions();
 		dumperOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
 		return new Yaml(dumperOptions);
