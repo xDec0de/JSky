@@ -89,7 +89,7 @@ public class YamlFile extends DataManager implements Reloadable {
 	 * {@link Thread#getContextClassLoader()} on {@link Thread#currentThread()}.
 	 * <p>
 	 * A detailed explanation about the {@code diskPath} and {@code resourcePath} parameters
-	 * can be found at {@link YamlFile}. Understanding what the <b>resource path</b>
+	 * can be found at {@link YamlFile}. Understanding what the <bf>resource path</b>
 	 * and <b>disk path</b> are is essential to use {@link YamlFile yaml files}.
 	 *
 	 * @param diskPath The {@link Nullable} {@link File} that will be combined with the
@@ -319,13 +319,16 @@ public class YamlFile extends DataManager implements Reloadable {
 	 * @param ignored The list of paths to ignore. Ignored paths won't be affected
 	 * and will remain unchanged. See {@link DataMap#update(HashMap, List)} for details.
 	 *
+	 * @param onException A {@link Consumer} that will accept any exception
+	 * produced by this method.
+	 *
 	 * @return {@code true} if the update was successful, {@code false} if
 	 * {@link #getUpdatedStream()} returns {@code null} or any exceptions occur
 	 * during the process.
 	 *
 	 * @since JSky 1.0.0
 	 */
-	public boolean update(@Nullable List<String> ignored) {
+	public boolean update(@Nullable List<String> ignored, @NotNull Consumer<IOException> onException) {
 		final InputStream updated = getUpdatedStream();
 		if (updated == null)
 			return false;
@@ -335,7 +338,8 @@ public class YamlFile extends DataManager implements Reloadable {
 		try {
 			updated.close();
 			return true;
-		} catch (IOException e) {
+		} catch (IOException ex) {
+			onException.accept(ex);
 			return false;
 		}
 	}
@@ -346,8 +350,46 @@ public class YamlFile extends DataManager implements Reloadable {
 	 * relies on {@link DataMap#update(HashMap, List)}. Details are provided there.
 	 * <p>
 	 * The file will only be {@link #save() saved} if necessary.
+	 *
+	 * @param ignored The list of paths to ignore. Ignored paths won't be affected
+	 * and will remain unchanged. See {@link DataMap#update(HashMap, List)} for details.
+	 *
+	 * @return {@code true} if the update was successful, {@code false} if
+	 * {@link #getUpdatedStream()} returns {@code null} or any exceptions occur
+	 * during the process.
+	 *
+	 * @since JSky 1.0.0
+	 */
+	public boolean update(@Nullable List<String> ignored) {
+		return update(ignored, e -> {});
+	}
+
+	/**
+	 * Updates this {@link YamlFile}, comparing its <b>cached</b> contents to those
+	 * on the {@link #getUpdatedStream() updated} {@link InputStream}. This method
+	 * relies on {@link DataMap#update(HashMap, List)}. Details are provided there.
 	 * <p>
-	 * This method is equivalent to {@code update(null)}.
+	 * The file will only be {@link #save() saved} if necessary.
+	 *
+	 * @param onException A {@link Consumer} that will accept any exception
+	 * produced by this method.
+	 *
+	 * @return {@code true} if the update was successful, {@code false} if
+	 * {@link #getUpdatedStream()} returns {@code null} or any exceptions occur
+	 * during the process.
+	 *
+	 * @since JSky 1.0.0
+	 */
+	public boolean update(@NotNull Consumer<IOException> onException) {
+		return update(null, onException);
+	}
+
+	/**
+	 * Updates this {@link YamlFile}, comparing its <b>cached</b> contents to those
+	 * on the {@link #getUpdatedStream() updated} {@link InputStream}. This method
+	 * relies on {@link DataMap#update(HashMap, List)}. Details are provided there.
+	 * <p>
+	 * The file will only be {@link #save() saved} if necessary.
 	 *
 	 * @return {@code true} if the update was successful, {@code false} if
 	 * {@link #getUpdatedStream()} returns {@code null} or any exceptions occur
@@ -356,7 +398,7 @@ public class YamlFile extends DataManager implements Reloadable {
 	 * @since JSky 1.0.0
 	 */
 	public boolean update() {
-		return update(null);
+		return update(null, e -> {});
 	}
 
 	/*
