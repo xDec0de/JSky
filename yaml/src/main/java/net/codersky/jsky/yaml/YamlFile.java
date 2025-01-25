@@ -176,14 +176,35 @@ public class YamlFile extends DataManager implements Reloadable {
 	 * {@link JFiles#create(File) created}, then {@link #update() updated} and
 	 * {@link #save() saved} to write any contents from the resource file to it.
 	 *
+	 * @param onException A {@link Consumer} that will accept any exception
+	 * produced by any of the called methods.
+	 *
+	 * @return {@code true} if every setup action succeeded, {@code false} otherwise.
+	 *
+	 * @since JSky 1.0.0
+	 */
+	public boolean setup(Consumer<Exception> onException) {
+		if (exists())
+			return reload();
+		return JFiles.create(file, onException) && update(onException) && save(onException);
+	}
+
+	/**
+	 * Does any necessary tasks for this file to be effectively usable.
+	 * This method has two possible paths:
+	 * <p>
+	 * If the already {@link #exists() exists}, it will just be {@link #reload() reloaded}.
+	 * <p>
+	 * If the file doesn't {@link #exists() exist}, it will first be
+	 * {@link JFiles#create(File) created}, then {@link #update() updated} and
+	 * {@link #save() saved} to write any contents from the resource file to it.
+	 *
 	 * @return {@code true} if every setup action succeeded, {@code false} otherwise.
 	 *
 	 * @since JSky 1.0.0
 	 */
 	public boolean setup() {
-		if (exists())
-			return reload();
-		return JFiles.create(file) && update() && save();
+		return setup(e -> {});
 	}
 
 	/**
@@ -328,7 +349,7 @@ public class YamlFile extends DataManager implements Reloadable {
 	 *
 	 * @since JSky 1.0.0
 	 */
-	public boolean update(@Nullable List<String> ignored, @NotNull Consumer<IOException> onException) {
+	public boolean update(@Nullable List<String> ignored, @NotNull Consumer<Exception> onException) {
 		final InputStream updated = getUpdatedStream();
 		if (updated == null)
 			return false;
@@ -380,7 +401,7 @@ public class YamlFile extends DataManager implements Reloadable {
 	 *
 	 * @since JSky 1.0.0
 	 */
-	public boolean update(@NotNull Consumer<IOException> onException) {
+	public boolean update(@NotNull Consumer<Exception> onException) {
 		return update(null, onException);
 	}
 
