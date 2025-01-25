@@ -19,6 +19,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 /**
  * {@link DataManager} for {@link Yaml} files implementing the {@link Reloadable} {@code interface}.
@@ -195,6 +196,9 @@ public class YamlFile extends DataManager implements Reloadable {
 	 * Keep in mind that if you save the file before {@link #reload() loading}
 	 * it, the result will be an empty file, loosing any contents on it.
 	 *
+	 * @param onException A {@link Consumer} that will accept any exception
+	 * produced by this method.
+	 *
 	 * @return {@code true} if the file was saved successfully. {@code false}
 	 * otherwise. {@code false} could indicate that the file doesn't
 	 * {@link #exists() exist} and couldn't be created or that an {@link IOException}
@@ -202,10 +206,10 @@ public class YamlFile extends DataManager implements Reloadable {
 	 *
 	 * @since JSky 1.0.0
 	 */
-	public boolean save() {
+	public boolean save(@NotNull Consumer<Exception> onException) {
 		if (!getMap().isModified())
 			return true;
-		if (!exists() && !JFiles.create(file))
+		if (!exists() && !JFiles.create(file, onException))
 			return false;
 		try {
 			final FileWriter writer = new FileWriter(file, StandardCharsets.UTF_8);
@@ -214,8 +218,30 @@ public class YamlFile extends DataManager implements Reloadable {
 			getMap().setModified(false);
 			return true;
 		} catch (IOException e) {
+			onException.accept(e);
 			return false;
 		}
+	}
+
+	/**
+	 * Saves the <b>cached</b> contents of this {@link YamlFile} to disk.
+	 * If the internal {@link DataMap cache} hasn't been modified, nothing
+	 * will be done. If the file doesn't {@link #exists() exist}, this method
+	 * will attempt to {@link JFiles#create(File) create} it, checking if it
+	 * was able to do so.
+	 * <p>
+	 * Keep in mind that if you save the file before {@link #reload() loading}
+	 * it, the result will be an empty file, loosing any contents on it.
+	 *
+	 * @return {@code true} if the file was saved successfully. {@code false}
+	 * otherwise. {@code false} could indicate that the file doesn't
+	 * {@link #exists() exist} and couldn't be created or that an {@link IOException}
+	 * occurred when trying to write the contents to the existing file.
+	 *
+	 * @since JSky 1.0.0
+	 */
+	public boolean save() {
+		return save(e -> {});
 	}
 
 	/*
