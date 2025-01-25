@@ -217,8 +217,8 @@ public class YamlFile extends DataManager implements Reloadable {
 			writer.close();
 			getMap().setModified(false);
 			return true;
-		} catch (IOException e) {
-			onException.accept(e);
+		} catch (IOException ex) {
+			onException.accept(ex);
 			return false;
 		}
 	}
@@ -252,12 +252,15 @@ public class YamlFile extends DataManager implements Reloadable {
 	 * Reloads this {@link YamlFile}, reading the contents of the file on disk
 	 * to cache them into the internal {@link DataMap}.
 	 *
+	 * @param onException A {@link Consumer} that will accept any exception
+	 * produced by this method.
+	 *
 	 * @return {@code true} upon a successful reload, {@code false} only if an
 	 * {@link Exception} is thrown.
 	 *
 	 * @since JSky 1.0.0
 	 */
-	public boolean reload() {
+	public boolean reload(@NotNull Consumer<Exception> onException) {
 		try {
 			getMap().clear();
 			final HashMap<String, Object> loadedMap = this.yaml.load(new FileInputStream(this.file));
@@ -265,8 +268,22 @@ public class YamlFile extends DataManager implements Reloadable {
 				getMap().getInternalMap().putAll(loadedMap);
 			return true;
 		} catch (FileNotFoundException | SecurityException ex) {
+			onException.accept(ex);
 			return false;
 		}
+	}
+
+	/**
+	 * Reloads this {@link YamlFile}, reading the contents of the file on disk
+	 * to cache them into the internal {@link DataMap}.
+	 *
+	 * @return {@code true} upon a successful reload, {@code false} only if an
+	 * {@link Exception} is thrown.
+	 *
+	 * @since JSky 1.0.0
+	 */
+	public boolean reload() {
+		return reload(e -> {});
 	}
 
 	/*
