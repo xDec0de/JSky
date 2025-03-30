@@ -3,17 +3,18 @@ package net.codersky.jsky.cli;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.awt.AWTException;
+import java.awt.Robot;
+import java.awt.event.KeyEvent;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
-import java.util.Scanner;
 import java.util.function.Consumer;
 
 public class CLICommandManager {
 
 	private final HashMap<String, CLICommand> commands = new HashMap<>();
-	private final Scanner scanner = new Scanner(System.in);
-	private boolean running = false;
+	private CLIScannerThread scannerThread = null;
 
 	public boolean registerCommand(@NotNull String id, @NotNull CLICommand command) {
 		Objects.requireNonNull(id, "Command id cannot be null");
@@ -35,16 +36,22 @@ public class CLICommandManager {
 	}
 
 	public boolean isRunning() {
-		return this.running;
+		return scannerThread != null;
 	}
 
 	public void start() {
 		if (isRunning())
 			return;
-		this.running = true;
-		while (process(scanner.nextLine()))
-			continue;
-		this.running = false;
+		this.scannerThread = new CLIScannerThread(this);
+		this.scannerThread.start();
+	}
+
+	public boolean stop() {
+		if (!isRunning())
+			return false;
+		this.scannerThread.interrupt();
+		this.scannerThread = null;
+		return true;
 	}
 
 	public boolean process(@NotNull String input) {
