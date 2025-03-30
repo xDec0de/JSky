@@ -3,9 +3,6 @@ package net.codersky.jsky.cli;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.awt.AWTException;
-import java.awt.Robot;
-import java.awt.event.KeyEvent;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
@@ -16,22 +13,22 @@ public class CLICommandManager {
 	private final HashMap<String, CLICommand> commands = new HashMap<>();
 	private CLIScannerThread scannerThread = null;
 
-	public boolean registerCommand(@NotNull String id, @NotNull CLICommand command) {
+	public synchronized boolean registerCommand(@NotNull String id, @NotNull CLICommand command) {
 		Objects.requireNonNull(id, "Command id cannot be null");
 		Objects.requireNonNull(command, "Command cannot be null");
 		return commands.putIfAbsent(id, command) == command;
 	}
 
-	public boolean registerConsumer(@NotNull String id, @NotNull Consumer<String[]> command) {
+	public synchronized boolean registerConsumer(@NotNull String id, @NotNull Consumer<String[]> command) {
 		return registerCommand(id, args -> { command.accept(args); return true; });
 	}
 
-	public boolean unregisterCommand(@NotNull String id) {
+	public synchronized boolean unregisterCommand(@NotNull String id) {
 		return commands.remove(id) != null;
 	}
 
 	@Nullable
-	public CLICommand getCommand(@NotNull String id) {
+	public synchronized CLICommand getCommand(@NotNull String id) {
 		return commands.get(id);
 	}
 
@@ -65,5 +62,13 @@ public class CLICommandManager {
 			return cmd.onCommand(new String[0]);
 		else
 			return cmd.onCommand(Arrays.copyOfRange(parts, 1, parts.length));
+	}
+
+	public static void main(String[] args) {
+		final CLICommandManager manager = new CLICommandManager();
+		manager.registerConsumer("say", in -> System.out.println(Arrays.toString(in)));
+		manager.registerCommand("stop", in -> false);
+		manager.registerCommand("end", in -> manager.stop());
+		manager.start();
 	}
 }
