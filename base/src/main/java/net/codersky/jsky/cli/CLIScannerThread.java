@@ -23,7 +23,8 @@ class CLIScannerThread extends Thread {
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
-			manager.process(scanner.nextLine());
+			if (!manager.process(scanner.nextLine()))
+				running = false;
 		}
 	}
 

@@ -54,21 +54,13 @@ public class CLICommandManager {
 	public boolean process(@NotNull String input) {
 		final String[] parts = Objects.requireNonNull(input).split(" ");
 		if (parts.length == 0)
-			return false;
+			return true;
 		final CLICommand cmd = getCommand(parts[0]);
 		if (cmd == null)
-			return false;
+			return true;
 		if (parts.length == 1)
 			return cmd.onCommand(new String[0]);
 		else
 			return cmd.onCommand(Arrays.copyOfRange(parts, 1, parts.length));
-	}
-
-	public static void main(String[] args) {
-		final CLICommandManager manager = new CLICommandManager();
-		manager.registerConsumer("say", in -> System.out.println(Arrays.toString(in)));
-		manager.registerCommand("stop", in -> false);
-		manager.registerCommand("end", in -> manager.stop());
-		manager.start();
 	}
 }
