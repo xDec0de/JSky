@@ -32,16 +32,16 @@ public abstract class CLICommand {
 
 	public boolean matches(@NotNull String name) {
 		return name.equalsIgnoreCase(this.name) ||
-				JCollections.contains(aliases, alias -> alias.equalsIgnoreCase(name));
+				JCollections.contains(this.aliases, alias -> alias.equalsIgnoreCase(name));
 	}
 
 	public boolean conflictsWith(@NotNull CLICommand other) {
-		if (other.matches(this.name))
+		if (matches(other.getName()))
 			return false;
-		for (String alias : this.aliases)
-			if (other.matches(alias))
-				return false;
-		return true;
+		for (String alias : other.getAliases())
+			if (matches(alias))
+				return true;
+		return false;
 	}
 
 	public abstract boolean onCommand(@NotNull String @NotNull [] args);

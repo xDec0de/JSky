@@ -6,7 +6,7 @@ import java.util.Scanner;
 class CLIScannerThread extends Thread {
 
 	private final CLICommandManager manager;
-	private boolean running = false;
+	private boolean interrupted = false;
 
 	CLIScannerThread(CLICommandManager manager) {
 		this.manager = manager;
@@ -14,23 +14,21 @@ class CLIScannerThread extends Thread {
 
 	@Override
 	public void run() {
-		running = true;
 		final Scanner scanner = new Scanner(System.in);
-		while (running) {
+		while (!interrupted) {
 			try {
 				if (System.in.available() == 0)
 					continue;
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
-			if (!manager.process(scanner.nextLine()))
-				running = false;
+			manager.process(scanner.nextLine());
 		}
 	}
 
 	@Override
 	public void interrupt() {
-		this.running = false;
+		this.interrupted = true;
 		super.interrupt();
 	}
 }

@@ -12,7 +12,16 @@ import java.util.function.Predicate;
 public class CLICommandManager {
 
 	private final ArrayList<CLICommand> commands = new ArrayList<>();
+	private final CLICommandPool pool;
 	private CLIScannerThread scannerThread = null;
+
+	public CLICommandManager(@Nullable CLICommandPool pool) {
+		this.pool = pool;
+	}
+
+	public CLICommandManager() {
+		this(null);
+	}
 
 	public synchronized boolean registerCommand(@NotNull CLICommand command) {
 		Objects.requireNonNull(command, "Command cannot be null");
@@ -22,7 +31,7 @@ public class CLICommandManager {
 		return commands.add(command);
 	}
 
-	public synchronized boolean registerCommand(@NotNull String name, @NotNull Predicate<String[]> command) {
+	public synchronized boolean registerPredicate(@NotNull String name, @NotNull Predicate<String[]> command) {
 		return registerCommand(new CLICommand(name) {
 			@Override
 			public boolean onCommand(@NotNull String @NotNull [] args) {
@@ -31,8 +40,8 @@ public class CLICommandManager {
 		});
 	}
 
-	public synchronized boolean registerCommand(@NotNull String name, @NotNull Consumer<String[]> command) {
-		return registerCommand(name, args -> { command.accept(args); return true; });
+	public synchronized boolean registerConsumer(@NotNull String name, @NotNull Consumer<String[]> command) {
+		return registerPredicate(name, args -> { command.accept(args); return true; });
 	}
 
 	public synchronized boolean unregisterCommand(@NotNull String name) {
@@ -67,16 +76,23 @@ public class CLICommandManager {
 		return true;
 	}
 
+	@Nullable
+	public synchronized CLICommandPool getPool() {
+		return pool;
+	}
+
 	public boolean process(@NotNull String input) {
 		final String[] parts = Objects.requireNonNull(input).split(" ");
 		if (parts.length == 0)
-			return true;
+			return false;
 		final CLICommand cmd = getCommand(parts[0]);
 		if (cmd == null)
-			return true;
-		if (parts.length == 1)
-			return cmd.onCommand(new String[0]);
+			return false;
+		final String[] args = parts.length == 1 ? new String[0] : Arrays.copyOfRange(parts, 1, parts.length);
+		if (getPool() == null)
+			cmd.onCommand(args);
 		else
-			return cmd.onCommand(Arrays.copyOfRange(parts, 1, parts.length));
+			getPool().add(cmd, args);
+		return true;
 	}
 }
