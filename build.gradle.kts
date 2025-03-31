@@ -4,6 +4,7 @@ version = "1.0.0-SNAPSHOT"
 
 plugins {
 	java
+	`maven-publish`
 }
 
 tasks {
@@ -50,4 +51,45 @@ tasks {
 	}
 
 	defaultTasks("build")
+}
+
+subprojects {
+
+	apply(plugin = "java-library")
+	apply(plugin = "maven-publish")
+
+	tasks.register<Jar>("sourcesJar") {
+		archiveClassifier.set("sources")
+		from(sourceSets.main.get().allSource)
+	}
+
+	version = rootProject.version.toString()
+
+	publishing {
+		publishing {
+			repositories {
+				maven {
+					val snapshot = version.toString().endsWith("SNAPSHOT")
+					url = uri("https://repo.codersky.net/" + if (snapshot) "snapshots" else "releases")
+					name = if (snapshot) "cskSnapshots" else "cskReleases"
+					credentials(PasswordCredentials::class)
+					authentication {
+						create<BasicAuthentication>("basic")
+					}
+				}
+			}
+		}
+
+		publications {
+			create<MavenPublication>("maven") {
+				groupId = "${rootProject.group}.${project.group.toString().lowercase()}"
+				artifactId = project.name // Use the subproject name as the artifactId
+
+				// Include the main JAR
+				artifact(tasks["jar"])
+				// Include the sources JAR
+				artifact(tasks["sourcesJar"])
+			}
+		}
+	}
 }

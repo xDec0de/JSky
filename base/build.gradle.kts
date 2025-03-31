@@ -1,5 +1,5 @@
 plugins {
-	id("java")
+	`java-library`
 }
 
 repositories {
@@ -8,4 +8,15 @@ repositories {
 
 dependencies {
 	compileOnly(libs.jetbrains.annotations)
+}
+
+java {
+	withSourcesJar()
+}
+
+tasks {
+	jar {
+		archiveFileName.set("JSky-${project.version}.jar")
+		archiveClassifier = "default"
+	}
 }
