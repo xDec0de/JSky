@@ -3,33 +3,49 @@ package net.codersky.jsky.cli;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 public class CLICommandManager {
 
-	private final HashMap<String, CLICommand> commands = new HashMap<>();
+	private final ArrayList<CLICommand> commands = new ArrayList<>();
 	private CLIScannerThread scannerThread = null;
 
-	public synchronized boolean registerCommand(@NotNull String id, @NotNull CLICommand command) {
-		Objects.requireNonNull(id, "Command id cannot be null");
+	public synchronized boolean registerCommand(@NotNull CLICommand command) {
 		Objects.requireNonNull(command, "Command cannot be null");
-		return commands.putIfAbsent(id, command) == command;
+		for (CLICommand registered : commands)
+			if (command.conflictsWith(registered))
+				return false;
+		return commands.add(command);
 	}
 
-	public synchronized boolean registerConsumer(@NotNull String id, @NotNull Consumer<String[]> command) {
-		return registerCommand(id, args -> { command.accept(args); return true; });
+	public synchronized boolean registerCommand(@NotNull String name, @NotNull Predicate<String[]> command) {
+		return registerCommand(new CLICommand(name) {
+			@Override
+			public boolean onCommand(@NotNull String @NotNull [] args) {
+				return command.test(args);
+			}
+		});
 	}
 
-	public synchronized boolean unregisterCommand(@NotNull String id) {
-		return commands.remove(id) != null;
+	public synchronized boolean registerCommand(@NotNull String name, @NotNull Consumer<String[]> command) {
+		return registerCommand(name, args -> { command.accept(args); return true; });
+	}
+
+	public synchronized boolean unregisterCommand(@NotNull String name) {
+		final CLICommand cmd = getCommand(name);
+		return cmd != null && commands.remove(cmd);
 	}
 
 	@Nullable
-	public synchronized CLICommand getCommand(@NotNull String id) {
-		return commands.get(id);
+	public synchronized CLICommand getCommand(@NotNull String name) {
+		for (CLICommand cmd : this.commands)
+			if (cmd.matches(name))
+				return cmd;
+		return null;
 	}
 
 	public boolean isRunning() {

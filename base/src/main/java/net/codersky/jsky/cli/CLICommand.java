@@ -1,9 +1,63 @@
 package net.codersky.jsky.cli;
 
+import net.codersky.jsky.collections.JCollections;
 import org.jetbrains.annotations.NotNull;
 
-@FunctionalInterface
-public interface CLICommand {
+import java.util.Arrays;
+import java.util.Objects;
 
-	boolean onCommand(@NotNull String @NotNull [] args);
+public abstract class CLICommand {
+
+	private final String name;
+	private final String[] aliases;
+
+	public CLICommand(@NotNull String name, @NotNull String @NotNull ... aliases) {
+		this.name = Objects.requireNonNull(name, "CLICommand name cannot be null");
+		this.aliases = Objects.requireNonNull(aliases, "CLICommand aliases array cannot be null");
+		for (String alias : aliases)
+			Objects.requireNonNull(alias, "CLICommand alias cannot be null");
+	}
+
+	public CLICommand(@NotNull String name) {
+		this(name, new String[0]);
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public String[] getAliases() {
+		return aliases;
+	}
+
+	public boolean matches(@NotNull String name) {
+		return name.equalsIgnoreCase(this.name) ||
+				JCollections.contains(aliases, alias -> alias.equalsIgnoreCase(name));
+	}
+
+	public boolean conflictsWith(@NotNull CLICommand other) {
+		if (other.matches(this.name))
+			return false;
+		for (String alias : this.aliases)
+			if (other.matches(alias))
+				return false;
+		return true;
+	}
+
+	public abstract boolean onCommand(@NotNull String @NotNull [] args);
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null || getClass() != obj.getClass())
+			return false;
+		final CLICommand other = (CLICommand) obj;
+		return Objects.equals(name, other.name) && Objects.deepEquals(aliases, other.aliases);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(name, Arrays.hashCode(aliases));
+	}
 }
