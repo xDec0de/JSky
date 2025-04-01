@@ -85,6 +85,9 @@ subprojects {
 				groupId = "${rootProject.group}.${project.group.toString().lowercase()}"
 				artifactId = project.name // Use the subproject name as the artifactId
 
+					packaging = "jar"
+				}
+
 				// Include the main JAR
 				artifact(tasks["jar"])
 				// Include the sources JAR

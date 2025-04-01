@@ -19,6 +19,5 @@ java {
 tasks {
 	jar {
 		archiveFileName.set("JSky-yaml-${project.version}.jar")
-		archiveClassifier = "default"
 	}
 }
