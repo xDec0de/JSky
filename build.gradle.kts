@@ -85,6 +85,7 @@ subprojects {
 				groupId = "${rootProject.group}.${project.group.toString().lowercase()}"
 				artifactId = project.name // Use the subproject name as the artifactId
 
+				pom {
 					packaging = "jar"
 				}
 
