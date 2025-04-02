@@ -1,7 +1,11 @@
 [versions]
 jetbrains-annotations = "24.0.0"
 snakeyaml = "2.3"
+shadow = "8.3.5"
 
 [libraries]
 jetbrains-annotations = { group = "org.jetbrains", name = "annotations", version.ref = "jetbrains-annotations" }
 snakeyaml = { group = "org.yaml", name = "snakeyaml", version.ref = "snakeyaml" }
+
+[plugins]
+shadow = { id = "com.gradleup.shadow", version = "8.3.5" }

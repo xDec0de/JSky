@@ -5,6 +5,8 @@ version = "1.0.0-SNAPSHOT"
 plugins {
 	java
 	`maven-publish`
+	// libs.plugins.shadow TODO: This doesn't work, I don't really know why
+	id("com.gradleup.shadow") version libs.versions.shadow
 }
 
 tasks {
@@ -56,6 +58,7 @@ tasks {
 subprojects {
 
 	apply(plugin = "java-library")
+	apply(plugin = "com.gradleup.shadow")
 	apply(plugin = "maven-publish")
 
 	tasks.register<Jar>("sourcesJar") {
@@ -90,7 +93,7 @@ subprojects {
 				}
 
 				// Include the main JAR
-				artifact(tasks["jar"])
+				artifact(tasks["shadowJar"])
 				// Include the sources JAR
 				artifact(tasks["sourcesJar"])
 			}
