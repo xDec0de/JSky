@@ -1,4 +1,3 @@
-
 group = "net.codersky"
 version = "1.0.0-SNAPSHOT"
 
@@ -58,8 +57,8 @@ tasks {
 subprojects {
 
 	apply(plugin = "java-library")
-	apply(plugin = "com.gradleup.shadow")
 	apply(plugin = "maven-publish")
+	apply(plugin = "com.gradleup.shadow")
 
 	tasks.register<Jar>("sourcesJar") {
 		archiveClassifier.set("sources")
@@ -93,7 +92,9 @@ subprojects {
 				}
 
 				// Include the main JAR
-				artifact(tasks["shadowJar"])
+				artifact(tasks["shadowJar"]) {
+					classifier = ""
+				}
 				// Include the sources JAR
 				artifact(tasks["sourcesJar"])
 			}
