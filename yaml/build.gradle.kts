@@ -1,5 +1,6 @@
 plugins {
-	`java-library`
+	java
+	id("com.gradleup.shadow") version libs.versions.shadow
 }
 
 repositories {
@@ -17,7 +18,8 @@ java {
 }
 
 tasks {
-	jar {
+	shadowJar {
 		archiveFileName.set("JSky-yaml-${project.version}.jar")
+		// We do NOT relocate dependencies. Why? https://docs.codersky.net/jsky/about-modules#about-jsky-dependencies
 	}
 }
