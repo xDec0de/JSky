@@ -2,10 +2,14 @@ package net.codersky.jsky.test;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+
+import static net.codersky.jsky.strings.JStrings.asString;
 import static net.codersky.jsky.strings.JStrings.hasContent;
 import static net.codersky.jsky.strings.JStrings.hasKeyPattern;
 import static net.codersky.jsky.strings.JStrings.testAllChars;
 import static net.codersky.jsky.strings.JStrings.testAnyChar;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -52,5 +56,12 @@ public class TestJStrings {
 		assertFalse(hasKeyPattern("-key-pattern"));
 		assertFalse(hasKeyPattern("-key-pattern-"));
 		assertFalse(hasKeyPattern("key-pattern-"));
+	}
+
+	@Test
+	public void testAsString() {
+		assertEquals("hello world", asString(Arrays.asList("hello", "world"), " "));
+		assertEquals("hello world", asString(Arrays.asList("hello", "", "world"), " "));
+		assertEquals("hello  world", asString(Arrays.asList("hello", "", "world"), " ", null));
 	}
 }
