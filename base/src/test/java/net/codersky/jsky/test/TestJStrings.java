@@ -3,6 +3,7 @@ package net.codersky.jsky.test;
 import org.junit.jupiter.api.Test;
 
 import static net.codersky.jsky.strings.JStrings.hasContent;
+import static net.codersky.jsky.strings.JStrings.hasKeyPattern;
 import static net.codersky.jsky.strings.JStrings.testAllChars;
 import static net.codersky.jsky.strings.JStrings.testAnyChar;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -39,5 +40,17 @@ public class TestJStrings {
 		assertFalse(testAnyChar(ch -> ch == 'a', ""));
 		assertThrows(NPE, () -> testAnyChar(ch -> true, "", null));
 		assertThrows(NPE, () -> testAnyChar(null, "a"));
+	}
+
+	@Test
+	public void testHasKeyPattern() {
+		assertTrue(hasKeyPattern("key-pattern"));
+		assertTrue(hasKeyPattern("keypattern"));
+		assertFalse(hasKeyPattern("-"));
+		assertFalse(hasKeyPattern(" "));
+		assertFalse(hasKeyPattern(""));
+		assertFalse(hasKeyPattern("-key-pattern"));
+		assertFalse(hasKeyPattern("-key-pattern-"));
+		assertFalse(hasKeyPattern("key-pattern-"));
 	}
 }
