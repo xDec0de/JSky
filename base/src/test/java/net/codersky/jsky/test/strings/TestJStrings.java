@@ -1,4 +1,4 @@
-package net.codersky.jsky.test;
+package net.codersky.jsky.test.strings;
 
 import org.junit.jupiter.api.Test;
 
