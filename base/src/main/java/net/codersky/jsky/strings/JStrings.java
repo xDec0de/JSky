@@ -114,18 +114,38 @@ public class JStrings {
 	 */
 
 	/**
-	 * Tests if all the provided {@code sequences} follow the {@link KeyPattern} annotation.
-	 * This method relies on {@link #testAllChars(CharPredicate, CharSequence...)},
-	 * using a {@link CharPredicate} that tests for {@link KeyPattern} restrictions
-	 * on every character.
+	 * Checks if a {@link CharSequence} follows the pattern defined by
+	 * {@link KeyPattern} (See details {@link KeyPattern here}):
 	 *
-	 * @param sequences The {@link CharSequence CharSequences} to test.
+	 * @param seq The {@link CharSequence} to check.
 	 *
-	 * @return {@code true} if all the provided {@code sequences} follow the
-	 * {@link KeyPattern} annotation, {@code false} otherwise.
+	 * @return {@code true} if the sequence matches the
+	 * {@link KeyPattern}, {@code false} otherwise.
+	 *
+	 * @throws NullPointerException if {@code seq} is {@code null}
+	 *
+	 * @since JSky 1.0.0
 	 */
-	public static boolean hasKeyPattern(@NotNull CharSequence... sequences) {
-		return testAllChars(ch -> (ch >= '0' && ch <= '9') || ch == '-', sequences);
+	public static boolean hasKeyPattern(@NotNull CharSequence seq) {
+		int chars = 0;
+		boolean lastWasDash = false;
+		final int len = seq.length();
+		if (len == 0)
+			return false;
+		for (int i = 0; i < len; i++) {
+			final char ch = seq.charAt(i);
+			if (ch == '-') {
+				if (i == 0 || i == len - 1 || lastWasDash)
+					return false;
+				lastWasDash = true;
+			}
+			else if (ch >= 'a' && ch <= 'z') {
+				lastWasDash = false;
+				chars++;
+			} else
+				return false;
+		}
+		return chars > 0;
 	}
 
 	/*
