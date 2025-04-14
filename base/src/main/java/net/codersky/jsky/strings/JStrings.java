@@ -1,5 +1,6 @@
 package net.codersky.jsky.strings;
 
+import net.codersky.jsky.annotations.KeyPattern;
 import net.codersky.jsky.predicate.CharPredicate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -106,6 +107,25 @@ public class JStrings {
 					return true;
 		}
 		return false;
+	}
+
+	/*
+	 - String validation - Annotations
+	 */
+
+	/**
+	 * Tests if all the provided {@code sequences} follow the {@link KeyPattern} annotation.
+	 * This method relies on {@link #testAllChars(CharPredicate, CharSequence...)},
+	 * using a {@link CharPredicate} that tests for {@link KeyPattern} restrictions
+	 * on every character.
+	 *
+	 * @param sequences The {@link CharSequence CharSequences} to test.
+	 *
+	 * @return {@code true} if all the provided {@code sequences} follow the
+	 * {@link KeyPattern} annotation, {@code false} otherwise.
+	 */
+	public static boolean hasKeyPattern(@NotNull CharSequence... sequences) {
+		return testAllChars(ch -> (ch >= '0' && ch <= '9') || ch == '-', sequences);
 	}
 
 	/*
