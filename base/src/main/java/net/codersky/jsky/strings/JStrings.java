@@ -1,5 +1,6 @@
 package net.codersky.jsky.strings;
 
+import net.codersky.jsky.predicate.CharPredicate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
@@ -40,6 +41,70 @@ public class JStrings {
 		for (int i = 0; i < len; i++)
 			if (!Character.isWhitespace(seq.charAt(i)))
 				return true;
+		return false;
+	}
+
+	/*
+	 - String validation - CharPredicate test
+	 */
+
+	/**
+	 * Tests the provided {@code condition} on every character of the provided
+	 * {@code sequences}. If <b>any</b> character of said {@code sequences}
+	 * doesn't satisfy the {@code condition}, then {@code false} is immediately
+	 * returned and no further testing is done.
+	 *
+	 * @param condition The {@link CharPredicate} used to
+	 * {@link CharPredicate#test(char) test} all characters.
+	 * @param sequences The {@link CharSequence CharSequences} to test.
+	 *
+	 * @return {@code true} if every character of every {@link CharSequence}
+	 * satisfies the provided {@code condition}, {@code false} otherwise.
+	 *
+	 * @throws NullPointerException if either {@code condition} or {@code sequences}
+	 * are {@code null}, or if any element in {@code sequences} is {@code null}
+	 *
+	 * @see CharPredicate
+	 * @see #testAnyChar(CharPredicate, CharSequence...)
+	 */
+	public static boolean testAllChars(@NotNull CharPredicate condition, @NotNull CharSequence... sequences) {
+		int len;
+		for (CharSequence seq : sequences) {
+			len = seq.length();
+			for (int i = 0; i < len; i++)
+				if (!condition.test(seq.charAt(i)))
+					return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Tests the provided {@code condition} on every character of the provided
+	 * {@code sequences}. If <b>any</b> character of any {@code CharSequence} in
+	 * {@code sequences} satisfies the {@code condition}, then {@code true} is
+	 * immediately returned and no further testing is done.
+	 *
+	 * @param condition The {@link CharPredicate} used to
+	 * {@link CharPredicate#test(char) test} all characters.
+	 * @param sequences The {@link CharSequence CharSequences} to test.
+	 *
+	 * @return {@code true} if any character of any {@link CharSequence}
+	 * satisfies the provided {@code condition}, {@code false} otherwise.
+	 *
+	 * @throws NullPointerException if either {@code condition} or {@code sequences}
+	 * are {@code null}, or if any element in {@code sequences} is {@code null}
+	 *
+	 * @see CharPredicate
+	 * @see #testAllChars(CharPredicate, CharSequence...)
+	 */
+	public static boolean testAnyChar(@NotNull CharPredicate condition, @NotNull CharSequence... sequences) {
+		int len;
+		for (CharSequence seq : sequences) {
+			len = seq.length();
+			for (int i = 0; i < len; i++)
+				if (condition.test(seq.charAt(i)))
+					return true;
+		}
 		return false;
 	}
 
