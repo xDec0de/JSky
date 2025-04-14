@@ -60,24 +60,29 @@ subprojects {
 	apply(plugin = "maven-publish")
 	apply(plugin = "com.gradleup.shadow")
 
-	tasks.register<Jar>("sourcesJar") {
-		archiveClassifier.set("sources")
-		from(sourceSets.main.get().allSource)
+	tasks {
+		named("assemble") {
+			dependsOn("shadowJar")
+		}
+
+		register<Jar>("sourcesJar") {
+			archiveClassifier.set("sources")
+			from(sourceSets.main.get().allSource)
+		}
 	}
+
 
 	version = rootProject.version.toString()
 
 	publishing {
-		publishing {
-			repositories {
-				maven {
-					val snapshot = version.toString().endsWith("SNAPSHOT")
-					url = uri("https://repo.codersky.net/" + if (snapshot) "snapshots" else "releases")
-					name = if (snapshot) "cskSnapshots" else "cskReleases"
-					credentials(PasswordCredentials::class)
-					authentication {
-						create<BasicAuthentication>("basic")
-					}
+		repositories {
+			maven {
+				val snapshot = version.toString().endsWith("SNAPSHOT")
+				url = uri("https://repo.codersky.net/" + if (snapshot) "snapshots" else "releases")
+				name = if (snapshot) "cskSnapshots" else "cskReleases"
+				credentials(PasswordCredentials::class)
+				authentication {
+					create<BasicAuthentication>("basic")
 				}
 			}
 		}

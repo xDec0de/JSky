@@ -2,10 +2,13 @@
 jetbrains-annotations = "24.0.0"
 snakeyaml = "2.3"
 shadow = "8.3.5"
+junit-bom = "5.10.0"
 
 [libraries]
 jetbrains-annotations = { group = "org.jetbrains", name = "annotations", version.ref = "jetbrains-annotations" }
 snakeyaml = { group = "org.yaml", name = "snakeyaml", version.ref = "snakeyaml" }
+junit-bom = { group = "org.junit", name = "junit-bom", version.ref = "junit-bom" }
+
 
 [plugins]
 shadow = { id = "com.gradleup.shadow", version = "8.3.5" }
