@@ -1,5 +1,6 @@
 package net.codersky.jsky;
 
+import net.codersky.jsky.strings.JStrings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -647,6 +648,78 @@ public abstract class JNumbers {
 			}
 		}
 		return decimal;
+	}
+
+	/*
+	 - Hexadecimals
+	 */
+
+	/**
+	 * Checks if {@code ch} is a valid hexadecimal character.
+	 * So a {@code char} in the range of 0 to 9, a to f or A to F.
+	 *
+	 * @param ch The {@code char} to check.
+	 *
+	 * @return {@code true} if {@code ch} is a hexadecimal
+	 * character, {@code false} otherwise.
+	 *
+	 * @since JSky 1.0.0
+	 */
+	public static boolean isHexChar(char ch) {
+		return (ch >= '0' && ch <= '9') ||
+				(ch >= 'A' && ch <= 'F') ||
+				(ch >= 'a' && ch <= 'f');
+	}
+
+	/**
+	 * Checks if every character of {@code seq} is a
+	 * {@link #isHexChar(char) hexadecimal character}.
+	 * Optionally requiring a '#' prefix at the beginning of {@code seq}.
+	 *
+	 * @param seq The {@link CharSequence} to check.
+	 * @param prefixed Whether to require a '#' character
+	 * as the first character of {@code seq} or not. If
+	 * {@code false}, this will be <b>optional</b>.
+	 *
+	 * @return {@code true} if {@code seq} is a valid hexadecimal
+	 * {@link CharSequence}, {@code false} otherwise.
+	 *
+	 * @since JSky 1.0.0
+	 *
+	 * @see #isHex(CharSequence)
+	 */
+	public static boolean isHex(@NotNull CharSequence seq, boolean prefixed) {
+		final int len = seq.length();
+		final int begin;
+		if (len == 0)
+			return false;
+		if (prefixed) {
+			begin = 1;
+			if (len < 2 || seq.charAt(0) != '#')
+				return false;
+		} else
+			begin = seq.charAt(0) == '#' ? 1 : 0;
+		return JStrings.testAllChars(JNumbers::isHexChar, begin, seq);
+	}
+
+	/**
+	 * Checks if every character of {@code seq} is a
+	 * {@link #isHexChar(char) hexadecimal character}.
+	 * <p>
+	 * If you want to check for a '#' character at the
+	 * beginning of {@code seq}, use {@link #isHex(CharSequence, boolean)}.
+	 *
+	 * @param seq The {@link CharSequence} to check.
+	 *
+	 * @return {@code true} if {@code seq} is a valid hexadecimal
+	 * {@link CharSequence}, {@code false} otherwise.
+	 *
+	 * @since JSky 1.0.0
+	 *
+	 * @see #isHex(CharSequence, boolean)
+	 */
+	public static boolean isHex(@NotNull CharSequence seq) {
+		return isHex(seq, false);
 	}
 
 	/*
