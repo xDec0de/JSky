@@ -687,6 +687,7 @@ public abstract class JNumbers {
 	 * @since JSky 1.0.0
 	 *
 	 * @see #isHex(CharSequence)
+	 * @see JColor#isHex(String)
 	 */
 	public static boolean isHex(@NotNull CharSequence seq, boolean prefixed) {
 		final int len = seq.length();
@@ -717,6 +718,7 @@ public abstract class JNumbers {
 	 * @since JSky 1.0.0
 	 *
 	 * @see #isHex(CharSequence, boolean)
+	 * @see JColor#isHex(String)
 	 */
 	public static boolean isHex(@NotNull CharSequence seq) {
 		return isHex(seq, false);
