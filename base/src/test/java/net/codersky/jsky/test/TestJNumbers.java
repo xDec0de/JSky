@@ -2,11 +2,14 @@ package net.codersky.jsky.test;
 
 import org.junit.jupiter.api.Test;
 
+import static net.codersky.jsky.JNumbers.isHex;
 import static net.codersky.jsky.JNumbers.random;
 import static net.codersky.jsky.JNumbers.range;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestJNumbers {
 
@@ -30,5 +33,17 @@ public class TestJNumbers {
 	public void testRandomInstance() {
 		assertNotNull(random());
 		assertSame(random(), random());
+	}
+
+	// TODO: Add missing methods from random() here to isHex() here.
+
+	@Test
+	public void testIsHex() {
+		assertTrue(isHex("00112233445566778899aAbBcCdDeEfF"));
+		assertFalse(isHex("00112233445566778899aAbBcCdDeEfF", true));
+		assertTrue(isHex("#ff0000", true));
+		assertTrue(isHex("#ff0000"));
+		assertTrue(isHex("ff0000"));
+		assertTrue(isHex("#ff0000", false));
 	}
 }
