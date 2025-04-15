@@ -50,63 +50,117 @@ public class JStrings {
 	 */
 
 	/**
-	 * Tests the provided {@code condition} on every character of the provided
-	 * {@code sequences}. If <b>any</b> character of said {@code sequences}
+	 * Tests the provided {@code condition} on every character of {@code seq},
+	 * starting from the specified {@code beginIndex}. If <b>any</b> character
 	 * doesn't satisfy the {@code condition}, then {@code false} is immediately
 	 * returned and no further testing is done.
 	 *
 	 * @param condition The {@link CharPredicate} used to
 	 * {@link CharPredicate#test(char) test} all characters.
-	 * @param sequences The {@link CharSequence CharSequences} to test.
+	 * @param beginIndex The index to start testing from (inclusive).
+	 * @param seq The {@link CharSequence} to test.
 	 *
-	 * @return {@code true} if every character of every {@link CharSequence}
-	 * satisfies the provided {@code condition}, {@code false} otherwise.
+	 * @return {@code true} if every character of {@code seq} starting from
+	 * {@code beginIndex} satisfies the provided {@code condition},
+	 * {@code false} otherwise.
 	 *
-	 * @throws NullPointerException if either {@code condition} or {@code sequences}
-	 * are {@code null}, or if any element in {@code sequences} is {@code null}
+	 * @throws NullPointerException if either {@code condition} or {@code seq}
+	 * are {@code null}
+	 * @throws IndexOutOfBoundsException if {@code beginIndex} is negative or
+	 * greater than {@code seq.length()}
 	 *
 	 * @see CharPredicate
-	 * @see #testAnyChar(CharPredicate, CharSequence...)
+	 * @see #testAllChars(CharPredicate, CharSequence)
+	 * @see #testAnyChar(CharPredicate, CharSequence)
 	 */
-	public static boolean testAllChars(@NotNull CharPredicate condition, @NotNull CharSequence... sequences) {
-		int len;
-		for (CharSequence seq : sequences) {
-			len = seq.length();
-			for (int i = 0; i < len; i++)
-				if (!condition.test(seq.charAt(i)))
-					return false;
-		}
+	public static boolean testAllChars(@NotNull CharPredicate condition, int beginIndex, @NotNull CharSequence seq) {
+		final int len = seq.length();
+		if (beginIndex > len)
+			throw new IndexOutOfBoundsException(beginIndex);
+		for (int i = beginIndex; i < len; i++)
+			if (!condition.test(seq.charAt(i)))
+				return false;
 		return true;
 	}
 
 	/**
-	 * Tests the provided {@code condition} on every character of the provided
-	 * {@code sequences}. If <b>any</b> character of any {@code CharSequence} in
-	 * {@code sequences} satisfies the {@code condition}, then {@code true} is
-	 * immediately returned and no further testing is done.
+	 * Tests the provided {@code condition} on every character of {@code seq}.
+	 * If <b>any</b> character doesn't satisfy the {@code condition}, then
+	 * {@code false} is immediately returned and no further testing is done.
 	 *
 	 * @param condition The {@link CharPredicate} used to
 	 * {@link CharPredicate#test(char) test} all characters.
-	 * @param sequences The {@link CharSequence CharSequences} to test.
+	 * @param seq The {@link CharSequence} to test.
 	 *
-	 * @return {@code true} if any character of any {@link CharSequence}
+	 * @return {@code true} if every character of {@code seq}
 	 * satisfies the provided {@code condition}, {@code false} otherwise.
 	 *
 	 * @throws NullPointerException if either {@code condition} or {@code sequences}
 	 * are {@code null}, or if any element in {@code sequences} is {@code null}
 	 *
 	 * @see CharPredicate
-	 * @see #testAllChars(CharPredicate, CharSequence...)
+	 * @see #testAllChars(CharPredicate, int, CharSequence)
+	 * @see #testAnyChar(CharPredicate, CharSequence)
 	 */
-	public static boolean testAnyChar(@NotNull CharPredicate condition, @NotNull CharSequence... sequences) {
-		int len;
-		for (CharSequence seq : sequences) {
-			len = seq.length();
-			for (int i = 0; i < len; i++)
-				if (condition.test(seq.charAt(i)))
-					return true;
-		}
+	public static boolean testAllChars(@NotNull CharPredicate condition, @NotNull CharSequence seq) {
+		return testAllChars(condition, 0, seq);
+	}
+
+	/**
+	 * Tests the provided {@code condition} on every character of {@code seq},
+	 * starting from the specified {@code beginIndex}. If <b>any</b> character
+	 * satisfies the {@code condition}, then {@code true} is immediately
+	 * returned and no further testing is done.
+	 *
+	 * @param condition The {@link CharPredicate} used to
+	 * {@link CharPredicate#test(char) test} all characters.
+	 * @param beginIndex The index to start testing from (inclusive).
+	 * @param seq The {@link CharSequence} to test.
+	 *
+	 * @return {@code true} if any character of {@code seq} starting from
+	 * {@code beginIndex} satisfies the provided {@code condition},
+	 * {@code false} otherwise.
+	 *
+	 * @throws NullPointerException if either {@code condition} or {@code seq}
+	 * are {@code null}
+	 * @throws IndexOutOfBoundsException if {@code beginIndex} is negative or
+	 * greater than {@code seq.length()}
+	 *
+	 * @see CharPredicate
+	 * @see #testAnyChar(CharPredicate, CharSequence)
+	 * @see #testAllChars(CharPredicate, int, CharSequence)
+	 */
+	public static boolean testAnyChar(@NotNull CharPredicate condition, int beginIndex, @NotNull CharSequence seq) {
+		final int len = seq.length();
+		if (beginIndex > len)
+			throw new IndexOutOfBoundsException(beginIndex);
+		for (int i = beginIndex; i < len; i++)
+			if (condition.test(seq.charAt(i)))
+				return true;
 		return false;
+	}
+
+	/**
+	 * Tests the provided {@code condition} on every character of {@code seq}.
+	 * If <b>any</b> character satisfies the {@code condition}, then
+	 * {@code true} is immediately returned and no further testing is done.
+	 *
+	 * @param condition The {@link CharPredicate} used to
+	 * {@link CharPredicate#test(char) test} all characters.
+	 * @param seq The {@link CharSequence} to test.
+	 *
+	 * @return {@code true} if any character of {@code seq}
+	 * satisfies the provided {@code condition}, {@code false} otherwise.
+	 *
+	 * @throws NullPointerException if either {@code condition} or {@code sequences}
+	 * are {@code null}, or if any element in {@code sequences} is {@code null}
+	 *
+	 * @see CharPredicate
+	 * @see #testAllChars(CharPredicate, int, CharSequence)
+	 * @see #testAnyChar(CharPredicate, CharSequence)
+	 */
+	public static boolean testAnyChar(@NotNull CharPredicate condition, @NotNull CharSequence seq) {
+		return testAnyChar(condition, 0, seq);
 	}
 
 	/*

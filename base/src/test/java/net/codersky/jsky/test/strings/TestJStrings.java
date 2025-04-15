@@ -18,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class TestJStrings {
 
 	final Class<NullPointerException> NPE = NullPointerException.class;
+	final Class<IndexOutOfBoundsException> IOOBE = IndexOutOfBoundsException.class;
 
 	@Test
 	public void testHasContent() {
@@ -32,7 +33,10 @@ public class TestJStrings {
 		assertTrue(testAllChars(ch -> ch == 'a', "aaaaaa"));
 		assertFalse(testAllChars(ch -> ch == 'a', "aaabaaa"));
 		assertTrue(testAllChars(ch -> ch == 'a', ""));
-		assertThrows(NPE, () -> testAllChars(ch -> true, "", null));
+		assertTrue(testAllChars(ch -> ch == 'a', 1, "b"));
+		assertTrue(testAllChars(ch -> ch == 'a', 1, "ba"));
+		assertThrows(IOOBE, () -> testAllChars(ch -> true, 2, "a"));
+		assertThrows(NPE, () -> testAllChars(ch -> true, null));
 		assertThrows(NPE, () -> testAllChars(null, "a"));
 	}
 
@@ -40,9 +44,12 @@ public class TestJStrings {
 	public void testTestAnyChar() {
 		assertTrue(testAnyChar(ch -> ch == 'a', "aaaaaa"));
 		assertTrue(testAnyChar(ch -> ch == 'b', "aaabaaa"));
-		assertFalse(testAnyChar(ch -> ch == 'c', "aaabaaa", "bbbabbb"));
+		assertFalse(testAnyChar(ch -> ch == 'c', "aaabaaa"));
 		assertFalse(testAnyChar(ch -> ch == 'a', ""));
-		assertThrows(NPE, () -> testAnyChar(ch -> true, "", null));
+		assertFalse(testAnyChar(ch -> ch == 'a', 1, "a"));
+		assertFalse(testAnyChar(ch -> ch == 'b', 1, "ba"));
+		assertThrows(IOOBE, () -> testAnyChar(ch -> true, 2, "a"));
+		assertThrows(NPE, () -> testAnyChar(ch -> true, null));
 		assertThrows(NPE, () -> testAnyChar(null, "a"));
 	}
 
