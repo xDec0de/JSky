@@ -22,8 +22,4 @@ tasks {
 	jar {
 		archiveFileName.set("JSky-${project.version}.jar")
 	}
-
-	test {
-		useJUnitPlatform()
-	}
 }

@@ -1,22 +1,32 @@
-group = "net.codersky"
-version = "1.0.0-SNAPSHOT"
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
 	java
 	`maven-publish`
-	// libs.plugins.shadow TODO: This doesn't work, I don't really know why
 	id("com.gradleup.shadow") version libs.versions.shadow
+	jacoco
+}
+
+group = "net.codersky"
+version = "1.0.0-SNAPSHOT"
+
+repositories {
+	mavenCentral()
+}
+
+jacoco {
+	toolVersion = "0.8.11"
 }
 
 tasks {
-
 	wrapper {
 		gradleVersion = "8.8"
 		distributionType = Wrapper.DistributionType.ALL
 	}
 
-	named("build") {
-		dependsOn(subprojects.map { it.tasks.named("build") })
+	named("assemble") {
+		dependsOn(subprojects.map { it.tasks.named("assemble") })
 		doLast {
 			val buildOut = project.layout.buildDirectory.dir("libs").get().asFile.apply {
 				if (!exists()) mkdirs()
@@ -44,6 +54,28 @@ tasks {
 		}
 	}
 
+	register<JacocoReport>("codeCoverageReport") {
+		group = "verification"
+		description = "Generates combined coverage report"
+
+		dependsOn("build")
+
+		executionData.setFrom(fileTree(project.rootDir).include("**/build/jacoco/*.exec"))
+
+		sourceDirectories.setFrom(files(subprojects.flatMap {
+			it.sourceSets.main.get().allSource.srcDirs
+		}))
+
+		classDirectories.setFrom(files(subprojects.flatMap {
+			it.sourceSets.main.get().output.classesDirs.files
+		}))
+
+		reports {
+			xml.required.set(true)
+			html.required.set(true)
+		}
+	}
+
 	named("clean") {
 		dependsOn(subprojects.map { it.tasks.named("clean") })
 		doFirst {
@@ -55,10 +87,14 @@ tasks {
 }
 
 subprojects {
+	repositories {
+		mavenCentral()
+	}
 
 	apply(plugin = "java-library")
 	apply(plugin = "maven-publish")
 	apply(plugin = "com.gradleup.shadow")
+	apply(plugin = "jacoco")
 
 	tasks {
 		named("assemble") {
@@ -68,6 +104,27 @@ subprojects {
 		register<Jar>("sourcesJar") {
 			archiveClassifier.set("sources")
 			from(sourceSets.main.get().allSource)
+		}
+
+		withType<Test>().configureEach {
+			useJUnitPlatform()
+
+			testLogging {
+				events = setOf(
+					TestLogEvent.FAILED,
+					TestLogEvent.SKIPPED,
+					TestLogEvent.PASSED
+				)
+				exceptionFormat = TestExceptionFormat.FULL
+				showExceptions = true
+				showCauses = true
+				showStackTraces = true
+			}
+
+			configure<JacocoTaskExtension> {
+				isEnabled = true
+				excludes = listOf("jdk.internal.*")
+			}
 		}
 	}
 
