@@ -24,10 +24,10 @@ public class JColor {
 	 * Checks if the provided {@code color} matches any
 	 * of the color formats supported by this class.
 	 * You can see details about each format here:
-	 * <li>
-	 *     <ul>{@link #isHex(String) Hexadecimal format}</ul>
-	 *     <ul>{@link #isRgb(String) RGB format}</ul>
-	 * </li>
+	 * <ul>
+	 *     <li>{@link #isHex(String) Hexadecimal format}</li>
+	 *     <li>{@link #isRgb(String) RGB format}</li>
+	 * </ul>
 	 *
 	 * @param color The String to check.
 	 *
