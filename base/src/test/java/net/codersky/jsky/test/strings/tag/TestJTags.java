@@ -24,6 +24,18 @@ class JTagParserTest {
 	}
 
 	@Test
+	void testMultipleParents() {
+		final JTag[] tags = JTagParser.parse("<one:one><two:two><three:three>");
+		assertEquals(3, tags.length);
+		assertEquals("one", tags[0].getName());
+		assertEquals("one", tags[0].getContent());
+		assertEquals("two", tags[1].getContent());
+		assertEquals("two", tags[1].getContent());
+		assertEquals("three", tags[2].getContent());
+		assertEquals("three", tags[2].getContent());
+	}
+
+	@Test
 	void testNestedValidTags() {
 		final JTag[] tags = JTagParser.parse("<parent:content<child:sub>>");
 		assertEquals(1, tags.length);
