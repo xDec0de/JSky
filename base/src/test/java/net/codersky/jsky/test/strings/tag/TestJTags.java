@@ -36,6 +36,24 @@ class JTagParserTest {
 	}
 
 	@Test
+	void testParseOne() {
+		final String input = "a<first:first><second:second>";
+		final JTag first = JTagParser.parseOne(input);
+		assertNotNull(first);
+		assertEquals("first", first.getName());
+		assertEquals("first", first.getContent());
+		final JTag second = JTagParser.parseOne(input, 14);
+		assertNotNull(second);
+		assertEquals("second", second.getName());
+		assertEquals("second", second.getContent());
+		assertNull(JTagParser.parseOne("invalid"));
+		assertNull(JTagParser.parseOne("<invalid>"));
+		assertNull(JTagParser.parseOne("<invalid"));
+		assertNull(JTagParser.parseOne("invalid>"));
+		assertNull(JTagParser.parseOne(">invalid:brackets<"));
+	}
+
+	@Test
 	void testNestedValidTags() {
 		final JTag[] tags = JTagParser.parse("<parent:content<child:sub>>");
 		assertEquals(1, tags.length);

@@ -41,6 +41,18 @@ public final class JTagParser {
 		return tags.toArray(new JTag[0]);
 	}
 
+	public static @Nullable JTag parseOne(@NotNull final String input, int fromIndex) {
+		final int openBracket = findOpenBracket(input, fromIndex);
+		final int closeBracket = findCloseBracket(input, openBracket);
+		if (openBracket == -1 || closeBracket == -1)
+			return null;
+		return parseTag(input.substring(openBracket + 1, closeBracket));
+	}
+
+	public static @Nullable JTag parseOne(@NotNull final String input) {
+		return parseOne(input, 0);
+	}
+
 	@Nullable
 	private static JTag parseTag(@NotNull final String tagContent) {
 		final int colonPos = tagContent.indexOf(':');
