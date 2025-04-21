@@ -40,9 +40,9 @@ tasks {
 					println("No JAR found in subproject: ${subproject.name}")
 				else {
 					jarFiles.forEach { jarFile ->
-						var fileName = "JSky-${subproject.name}-${version}.jar";
+						var fileName = "JSky-${subproject.name}-${version}.jar"
 						if (subproject.name.equals("base"))
-							fileName = "JSky-${version}.jar";
+							fileName = "JSky-${version}.jar"
 						copy {
 							from(jarFile)
 							into(buildOut)
@@ -58,8 +58,10 @@ tasks {
 		group = "verification"
 		description = "Generates combined coverage report"
 
-		dependsOn("build")
+		// Explicitly depend on all subproject test tasks
+		dependsOn(subprojects.map { it.tasks.named("test") })
 
+		// Collect all execution data files
 		executionData.setFrom(fileTree(project.rootDir).include("**/build/jacoco/*.exec"))
 
 		sourceDirectories.setFrom(files(subprojects.flatMap {
@@ -121,7 +123,7 @@ subprojects {
 				showStackTraces = true
 			}
 
-			configure<JacocoTaskExtension> {
+			extensions.configure<JacocoTaskExtension> {
 				isEnabled = true
 				excludes = listOf("jdk.internal.*")
 			}
