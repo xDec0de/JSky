@@ -60,6 +60,8 @@ public final class JTagParser {
 			return null;
 		final String name = tagContent.substring(0, colonPos).trim();
 		final String remaining = tagContent.substring(colonPos + 1);
+		if (name.isBlank() || remaining.isBlank())
+			return null;
 		final List<JTag> children = new ArrayList<>();
 		final String extracted = extractContent(remaining, children);
 		return new JTag(name, extracted, children.toArray(new JTag[0]));

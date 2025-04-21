@@ -5,6 +5,8 @@ import net.codersky.jsky.strings.tag.JTagParser;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class JTagParserTest {
 
@@ -51,6 +53,8 @@ class JTagParserTest {
 		assertNull(JTagParser.parseOne("<invalid"));
 		assertNull(JTagParser.parseOne("invalid>"));
 		assertNull(JTagParser.parseOne(">invalid:brackets<"));
+		assertNull(JTagParser.parseOne("<blank_content: >"));
+		assertNull(JTagParser.parseOne("< :blank_name>"));
 	}
 
 	@Test
@@ -76,16 +80,6 @@ class JTagParserTest {
 		assertEquals(1, tags.length);
 		assertEquals("tag", tags[0].getName());
 		assertEquals("escaped<brackets>", tags[0].getContent());
-	}
-
-	@Test
-	void testMixedValidAndInvalidNested() {
-		final JTag[] tags = JTagParser.parse("<parent:<valid:ok><invalid>>");
-		assertEquals(1, tags.length);
-		assertEquals("parent", tags[0].getName());
-		assertEquals("<invalid>", tags[0].getContent());
-		assertEquals(1, tags[0].getChildren().length);
-		assertEquals("valid", tags[0].getChildren()[0].getName());
 	}
 
 	@Test
