@@ -13,37 +13,73 @@ public class TestPredicates {
 
 	@Test
 	public void testBytePredicate() {
-		BytePredicate isOne = v -> v == 1;
-		BytePredicate isTwo = v -> v == 2;
-		assertTrue(isOne.or(isTwo).test((byte) 1));
-		assertFalse(isOne.and(isTwo).test((byte) 1));
-		assertFalse(isOne.negate().test((byte) 1));
+		final byte one = 1;
+		final byte two = 2;
+		final byte three = 3;
+		final BytePredicate isOne = v -> v == 1;
+		final BytePredicate isTwo = v -> v == 2;
+		assertTrue(isOne.or(isTwo).test(one));
+		assertTrue(isOne.or(isTwo).test(two));
+		assertFalse(isOne.or(isOne).test(two));
+		assertFalse(isOne.and(isTwo).test(one));
+		assertTrue(isOne.and(isOne).test(one));
+		assertFalse(isOne.and(isTwo).test(two));
+		assertFalse(isOne.and(isTwo).test(three));
+		assertFalse(isOne.negate().test(one));
+		assertTrue(isOne.negate().test(two));
 	}
 
 	@Test
 	public void testCharPredicate() {
-		CharPredicate isA = v -> v == 'a';
-		CharPredicate isB = v -> v == 'b';
-		assertTrue(isA.or(isB).test('a'));
-		assertFalse(isA.and(isB).test('a'));
-		assertFalse(isA.negate().test('a'));
+		final char one = '1';
+		final char two = '2';
+		final char three = '3';
+		final CharPredicate isOne = v -> v == '1';
+		final CharPredicate isTwo = v -> v == '2';
+		assertTrue(isOne.or(isTwo).test(one));
+		assertTrue(isOne.or(isTwo).test(two));
+		assertFalse(isOne.or(isOne).test(two));
+		assertFalse(isOne.and(isTwo).test(one));
+		assertTrue(isOne.and(isOne).test(one));
+		assertFalse(isOne.and(isTwo).test(two));
+		assertFalse(isOne.and(isTwo).test(three));
+		assertFalse(isOne.negate().test(one));
+		assertTrue(isOne.negate().test(two));
 	}
 
 	@Test
 	public void testFloatPredicate() {
-		FloatPredicate isOne = v -> v == 1f;
-		FloatPredicate isTwo = v -> v == 2f;
-		assertTrue(isOne.or(isTwo).test(1f));
-		assertFalse(isOne.and(isTwo).test(1f));
-		assertFalse(isOne.negate().test(1f));
+		final float one = 1;
+		final float two = 2;
+		final float three = 3;
+		final FloatPredicate isOne = v -> v == 1f;
+		final FloatPredicate isTwo = v -> v == 2f;
+		assertTrue(isOne.or(isTwo).test(one));
+		assertTrue(isOne.or(isTwo).test(two));
+		assertFalse(isOne.or(isOne).test(two));
+		assertFalse(isOne.and(isTwo).test(one));
+		assertTrue(isOne.and(isOne).test(one));
+		assertFalse(isOne.and(isTwo).test(two));
+		assertFalse(isOne.and(isTwo).test(three));
+		assertFalse(isOne.negate().test(one));
+		assertTrue(isOne.negate().test(two));
 	}
 
 	@Test
 	public void testShortPredicate() {
-		ShortPredicate isOne = v -> v == 1;
-		ShortPredicate isTwo = v -> v == 2;
-		assertTrue(isOne.or(isTwo).test((short) 1));
-		assertFalse(isOne.and(isTwo).test((short) 1));
-		assertFalse(isOne.negate().test((short) 1));
+		final short one = 1;
+		final short two = 2;
+		final short three = 3;
+		final ShortPredicate isOne = v -> v == 1;
+		final ShortPredicate isTwo = v -> v == 2;
+		assertTrue(isOne.or(isTwo).test(one));
+		assertTrue(isOne.or(isTwo).test(two));
+		assertFalse(isOne.or(isOne).test(two));
+		assertFalse(isOne.and(isTwo).test(one));
+		assertTrue(isOne.and(isOne).test(one));
+		assertFalse(isOne.and(isTwo).test(two));
+		assertFalse(isOne.and(isTwo).test(three));
+		assertFalse(isOne.negate().test(one));
+		assertTrue(isOne.negate().test(two));
 	}
 }
