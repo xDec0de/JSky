@@ -71,7 +71,6 @@ subprojects {
 		}
 	}
 
-
 	version = rootProject.version.toString()
 
 	publishing {
