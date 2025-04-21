@@ -21,8 +21,14 @@ jobs:
           distribution: 'temurin'
           cache: 'gradle'
 
+      - name: Warm up Gradle Daemon
+        run: |
+          ./gradlew --stop || true
+          ./gradlew help --no-daemon  # First run without daemon to populate caches
+          ./gradlew help  # Second run with daemon
+
       - name: Build and run tests with coverage
-        run: ./gradlew codeCoverageReport
+        run: ./gradlew codeCoverageReport --no-build-cache --parallel
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
