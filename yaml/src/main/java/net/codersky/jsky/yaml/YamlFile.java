@@ -186,7 +186,7 @@ public class YamlFile extends DataManager implements Reloadable {
 	public boolean setup(Consumer<Exception> onException) {
 		if (exists())
 			return reload();
-		return JFiles.create(file, onException) && update(onException) && save(onException);
+		return JFiles.create(file, onException) && update(onException);
 	}
 
 	/**
