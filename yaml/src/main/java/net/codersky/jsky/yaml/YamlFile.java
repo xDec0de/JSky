@@ -444,6 +444,6 @@ public class YamlFile extends DataManager implements Reloadable {
 
 	@Override
 	public String toString() {
-		return "YamlFile" + getMap();
+		return "YamlFile" + getMap().getInternalMap();
 	}
 }
