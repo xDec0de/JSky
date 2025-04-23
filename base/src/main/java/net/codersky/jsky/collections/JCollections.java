@@ -603,44 +603,44 @@ public class JCollections {
 
 	public static boolean contains(byte @NotNull [] array, @NotNull BytePredicate condition) {
 		for (final byte b : array)
-			if (!condition.test(b))
-				return false;
-		return true;
+			if (condition.test(b))
+				return true;
+		return false;
 	}
 
 	public static boolean contains(short @NotNull [] array, @NotNull ShortPredicate condition) {
 		for (final short s : array)
-			if (!condition.test(s))
-				return false;
-		return true;
+			if (condition.test(s))
+				return true;
+		return false;
 	}
 
 	public static boolean contains(int @NotNull [] array, @NotNull IntPredicate condition) {
 		for (final int i : array)
-			if (!condition.test(i))
-				return false;
-		return true;
+			if (condition.test(i))
+				return true;
+		return false;
 	}
 
 	public static boolean contains(long @NotNull [] array, @NotNull LongPredicate condition) {
 		for (final long l : array)
-			if (!condition.test(l))
-				return false;
-		return true;
+			if (condition.test(l))
+				return true;
+		return false;
 	}
 
 	public static boolean contains(int @NotNull [] array, @NotNull FloatPredicate condition) {
 		for (final float f : array)
-			if (!condition.test(f))
-				return false;
-		return true;
+			if (condition.test(f))
+				return true;
+		return false;
 	}
 
 	public static boolean contains(long @NotNull [] array, @NotNull DoublePredicate condition) {
 		for (final double d : array)
-			if (!condition.test(d))
-				return false;
-		return true;
+			if (condition.test(d))
+				return true;
+		return false;
 	}
 
 	/*
