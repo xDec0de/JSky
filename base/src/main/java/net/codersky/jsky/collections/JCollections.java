@@ -2,6 +2,7 @@ package net.codersky.jsky.collections;
 
 import net.codersky.jsky.JNumbers;
 import net.codersky.jsky.predicate.BytePredicate;
+import net.codersky.jsky.predicate.CharPredicate;
 import net.codersky.jsky.predicate.FloatPredicate;
 import net.codersky.jsky.predicate.ShortPredicate;
 import org.jetbrains.annotations.NotNull;
@@ -600,6 +601,13 @@ public class JCollections {
 	/*
 	 - Contains element - Array primitives
 	 */
+
+	public static boolean contains(char @NotNull [] array, @NotNull CharPredicate condition) {
+		for (final char c : array)
+			if (condition.test(c))
+				return true;
+		return false;
+	}
 
 	public static boolean contains(byte @NotNull [] array, @NotNull BytePredicate condition) {
 		for (final byte b : array)
