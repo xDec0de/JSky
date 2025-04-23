@@ -164,6 +164,50 @@ public class JStrings {
 	}
 
 	/*
+	 - startsWith
+	 */
+
+	/**
+	 * Checks if {@code str} starts with the provided {@code prefix}, with
+	 * an option to {@code ignoreCase}. This method uses
+	 * {@link String#regionMatches(boolean, int, String, int, int)}.
+	 *
+	 * @param ignoreCase Whether to ignore case when comparing characters or not.
+	 * @param str The source String to check.
+	 * @param prefix The prefix to find at the beginning {@code str}.
+	 *
+	 * @return {@code true} if {@code str} starts with the provided {@code prefix}.
+	 *
+	 * @since JSky 1.0.0
+	 */
+	public static boolean startsWith(boolean ignoreCase, @NotNull String str, @NotNull String prefix) {
+		return str.regionMatches(ignoreCase, 0, prefix, 0, prefix.length());
+	}
+
+	/*
+	 - endsWith
+	 */
+
+	/**
+	 * Checks if {@code str} ends with the provided {@code suffix}, with
+	 * an option to {@code ignoreCase}. This method uses
+	 * {@link String#regionMatches(boolean, int, String, int, int)}.
+	 *
+	 * @param ignoreCase Whether to ignore case when comparing characters or not.
+	 * @param str The source String to check.
+	 * @param suffix The suffix to find at the end of {@code str}.
+	 *
+	 * @return {@code true} if {@code str} ends with the provided {@code suffix}.
+	 *
+	 * @since JSky 1.0.0
+	 */
+	public static boolean endsWith(boolean ignoreCase, @NotNull String str, @NotNull String suffix) {
+		final int strLen = str.length();
+		final int sufLen = suffix.length();
+		return str.regionMatches(ignoreCase, strLen - sufLen, suffix, 0, sufLen);
+	}
+
+	/*
 	 - String validation - Annotations
 	 */
 

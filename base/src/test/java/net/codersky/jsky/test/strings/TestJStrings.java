@@ -5,8 +5,10 @@ import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 
 import static net.codersky.jsky.strings.JStrings.asString;
+import static net.codersky.jsky.strings.JStrings.endsWith;
 import static net.codersky.jsky.strings.JStrings.hasContent;
 import static net.codersky.jsky.strings.JStrings.hasKeyPattern;
+import static net.codersky.jsky.strings.JStrings.startsWith;
 import static net.codersky.jsky.strings.JStrings.testAllChars;
 import static net.codersky.jsky.strings.JStrings.testAnyChar;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -51,6 +53,20 @@ public class TestJStrings {
 		assertThrows(IOOBE, () -> testAnyChar(ch -> true, 2, "a"));
 		assertThrows(NPE, () -> testAnyChar(ch -> true, null));
 		assertThrows(NPE, () -> testAnyChar(null, "a"));
+	}
+
+	@Test
+	public void testStartsWith() {
+		assertTrue(startsWith(true, "pReFfIxStr", "preffix"));
+		assertFalse(startsWith(false, "pReFfIxStr", "preffix"));
+		assertFalse(startsWith(false, "pReFfIxStr", "preffixIsLongerThanStr"));
+	}
+
+	@Test
+	public void testEndsWith() {
+		assertTrue(endsWith(true, "strSuFfIx", "suffix"));
+		assertFalse(endsWith(false, "strSuFfIx", "suffix"));
+		assertFalse(endsWith(false, "strSuFfIx", "suffixIsLongerThanStr"));
 	}
 
 	@Test
