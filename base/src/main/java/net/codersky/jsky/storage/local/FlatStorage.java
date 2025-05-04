@@ -30,22 +30,24 @@ import java.util.function.Function;
  */
 public class FlatStorage extends Storage {
 
+	/** The required file extension for {@link FlatStorage} files. */
+	public static final String FILE_EXTENSION = ".jflat";
 	private final File file;
 
 	public FlatStorage(@NotNull File file) {
 		super(false);
-		if (!file.getName().endsWith(".mcufs"))
-			throw new IllegalArgumentException("FlatStorage only accepts files with the \".mcufs\" extension.");
+		if (!file.getName().endsWith(FILE_EXTENSION))
+			throw new IllegalArgumentException("FlatStorage only accepts files with the \"" + FILE_EXTENSION + "\" extension.");
 		this.file = file;
 	}
 
 	public FlatStorage(@NotNull String path) {
 		super(false);
-		this.file = new File(path.endsWith(".mcufs") ? path : path + ".mcufs");
+		this.file = new File(fixExtension(path));
 	}
 
 	/*
-	 * Utility
+	 - Utility
 	 */
 
 	public boolean setup() {
@@ -58,15 +60,19 @@ public class FlatStorage extends Storage {
 	}
 
 	public boolean rename(@NotNull String name) {
-		return file.renameTo(new File(file.getParent() + (name.endsWith(".mcufs") ? name : name + ".mcufs")));
+		return file.renameTo(new File(file.getParent(), fixExtension(name)));
 	}
 
 	public final boolean exists() {
 		return file.exists();
 	}
 
+	public final String fixExtension(@NotNull final String path) {
+		return path.endsWith(FILE_EXTENSION) ? path : path + FILE_EXTENSION;
+	}
+
 	/*
-	 * Saving
+	 - Saving
 	 */
 
 	@Override
@@ -140,9 +146,9 @@ public class FlatStorage extends Storage {
 		else if (first instanceof Boolean)
 			listAppend(key, builder.append('b'), (List<Boolean>) lst, false, b -> b ? "t" : "f");
 		else if (first instanceof UUID)
-			listAppend(key, builder.append('u'), (List<UUID>) lst, true, u -> u.toString());
+			listAppend(key, builder.append('u'), (List<UUID>) lst, true, UUID::toString);
 		else if (first instanceof Number) // Number identification character is upper case.
-			listAppend(key, builder.append(first.getClass().getSimpleName().charAt(0)), (List<Number>) lst, true, n -> n.toString());
+			listAppend(key, builder.append(first.getClass().getSimpleName().charAt(0)), (List<Number>) lst, true, Object::toString);
 		else {
 			System.err.println("Unsupported list data of type " + first.getClass().getName());
 			return null;
@@ -181,7 +187,7 @@ public class FlatStorage extends Storage {
 	}
 
 	/*
-	 * Loading
+	 - Loading
 	 */
 
 	@Override
