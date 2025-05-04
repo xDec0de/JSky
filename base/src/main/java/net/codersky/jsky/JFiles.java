@@ -28,13 +28,13 @@ public class JFiles {
 	 * {@link IOException} or {@link SecurityException}.
 	 *
 	 * @return {@code true} if the {@code file} created successfully.
-	 * {@code false} if the {@code file} already exists or if an error occurred.
+	 * {@code false} if an error occurred.
 	 *
 	 * @since JSky 1.0.0
 	 */
 	public static boolean create(@NotNull File file, @NotNull Consumer<Exception> err) {
 		if (file.exists())
-			return false;
+			return true;
 		final File parent = file.getParentFile();
 		if (parent != null)
 			parent.mkdirs();

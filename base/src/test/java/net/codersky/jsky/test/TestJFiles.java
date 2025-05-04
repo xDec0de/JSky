@@ -17,6 +17,7 @@ public class TestJFiles {
 	public void testFileCreation() {
 		assertTrue(JFiles.create(one));
 		assertTrue(one.exists() && one.isFile());
+		assertTrue(JFiles.create(one));
 		assertTrue(JFiles.create(nested));
 		assertTrue(nested.exists() && nested.isFile());
 		one.delete();
