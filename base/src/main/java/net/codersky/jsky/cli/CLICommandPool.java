@@ -1,6 +1,6 @@
 package net.codersky.jsky.cli;
 
-import net.codersky.jsky.JNumbers;
+import net.codersky.jsky.math.JNumbers;
 import net.codersky.jsky.tuple.pair.SafeImmutablePair;
 import net.codersky.jsky.tuple.pair.SafePair;
 import org.jetbrains.annotations.NotNull;

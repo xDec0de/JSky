@@ -1,10 +1,10 @@
-package net.codersky.jsky.test;
+package net.codersky.jsky.test.math;
 
 import org.junit.jupiter.api.Test;
 
-import static net.codersky.jsky.JNumbers.isHex;
-import static net.codersky.jsky.JNumbers.random;
-import static net.codersky.jsky.JNumbers.range;
+import static net.codersky.jsky.math.JNumbers.isHex;
+import static net.codersky.jsky.math.JNumbers.random;
+import static net.codersky.jsky.math.JNumbers.range;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

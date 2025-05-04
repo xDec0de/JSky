@@ -1,6 +1,6 @@
 package net.codersky.jsky.collections;
 
-import net.codersky.jsky.JNumbers;
+import net.codersky.jsky.math.JNumbers;
 import net.codersky.jsky.predicate.BytePredicate;
 import net.codersky.jsky.predicate.CharPredicate;
 import net.codersky.jsky.predicate.FloatPredicate;

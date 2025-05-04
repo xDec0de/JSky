@@ -1,5 +1,6 @@
 package net.codersky.jsky;
 
+import net.codersky.jsky.math.JNumbers;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

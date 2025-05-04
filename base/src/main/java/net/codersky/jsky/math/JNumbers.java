@@ -1,5 +1,6 @@
-package net.codersky.jsky;
+package net.codersky.jsky.math;
 
+import net.codersky.jsky.JColor;
 import net.codersky.jsky.strings.JStrings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
