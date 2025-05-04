@@ -81,108 +81,113 @@ public class FlatStorage extends Storage {
 			return true;
 		if (!setup())
 			return false;
-		int errors = 0;
-		try {
-			final FileWriter writer = new FileWriter(file);
+		try (final FileWriter writer = new FileWriter(file)) {
 			for (Entry<String, Object> entry : getEntries()) {
-				final String toWrite;
+				final StringBuilder toWrite = new StringBuilder();
 				if (entry.getValue() instanceof final List<?> lst) {
 					if (lst.isEmpty())
 						continue;
-					toWrite = toWrite(entry.getKey(), lst);
+					appendList(toWrite, entry.getKey(), lst);
 				} else
-					toWrite = toWrite(entry.getKey(), entry.getValue());
-				if (toWrite != null)
-					writer.write(toWrite);
-				else
-					errors++;
+					appendSimple(toWrite, entry.getKey(), entry.getValue());
+				if (!toWrite.isEmpty())
+					writer.write(toWrite.toString());
 			}
-			writer.close();
 		} catch (IOException e) {
-			e.printStackTrace();
 			return false;
 		}
-		if (errors != 0)
-			System.err.println("Failed to save " + file.getPath() + " because of " + errors + " error(s) shown above.");
-		else
-			getMap().setModified(false);
-		return errors == 0;
+		getMap().setModified(false);
+		return true;
 	}
 
-	// Saving - Simple objects //
+	/*
+	 - Saving - Utility
+	 */
 
-	private String toWrite(String key, Object value) {
-		final StringBuilder builder = new StringBuilder();
-		if (value instanceof CharSequence)
-			builder.append('s').append(key).append(':').append(value.toString().replace("\n", "\\n"));
-		else if (value instanceof Character)
-			builder.append('c').append(key).append(':').append(((char) value) == '\n' ? "\\n" : (char) value);
-		else if (value instanceof Boolean)
-			builder.append('b').append(key).append(':').append(((boolean) value ? "t" : "f"));
-		else if (value instanceof UUID)
-			builder.append('u').append(key).append(':').append(value.toString());
-		else if (value instanceof Number) // Number identification character is upper case.
-			builder.append(value.getClass().getSimpleName().charAt(0)).append(key).append(':').append(value.toString());
-		else {
-			System.err.println("Unsupported data of type " + value.getClass().getName() + " with a string value of \"" + value + "\"");
-			return null;
+	// NOTE: Number identification character is upper case.
+	private char getNumberId(@NotNull final Number n) {
+		return n.getClass().getSimpleName().charAt(0);
+	}
+
+	private StringBuilder addKey(final StringBuilder builder, char id, final String key) {
+		return builder.append(id).append(key).append(':');
+	}
+
+	/*
+	 - Saving - Simple objects
+	 */
+
+	// NOTE: Simple objects are stored as <id><key>:<value>
+
+	private void appendSimple(final StringBuilder b, final String key, final Object value) {
+		switch (value) {
+			case String s -> addKey(b, 's', key).append(s.replace("\n", "\\n"));
+			case Character ch -> addKey(b, 'c', key).append(ch == '\n' ? "\\n" : ch);
+			case Boolean bool -> addKey(b, 'b', key).append(bool ? 't' : 'f');
+			case UUID uuid -> addKey(b, 'u', key).append(uuid);
+			case Number n -> addKey(b, getNumberId(n), key).append(n);
+			case null, default -> { }
 		}
-		return builder.append('\n').toString();
 	}
 
-	// Saving - Lists //
+	/*
+	 - Saving - Lists
+	 */
+
+	// NOTE: Lists are stored as *<id><key>:<value> (* Prefix)
 
 	/**
 	 * @throws ClassCastException If lst contains elements of different types (Try with Arrays.asList("exception", 10))
 	 */
 	@SuppressWarnings("unchecked")
-	private String toWrite(String key, List<?> lst) {
+	private void appendList(final StringBuilder builder, final String key, final List<?> lst) {
 		final Object first = lst.getFirst();
-		final StringBuilder builder = new StringBuilder("*");
-		if (first instanceof CharSequence)
-			listAppend(key, builder.append('s'), (List<CharSequence>) lst);
-		else if (first instanceof Character)
-			listAppend(key, builder.append('c'), (List<Character>) lst, false, c -> c == '\n' ? "\\n" : c.toString());
-		else if (first instanceof Boolean)
-			listAppend(key, builder.append('b'), (List<Boolean>) lst, false, b -> b ? "t" : "f");
-		else if (first instanceof UUID)
-			listAppend(key, builder.append('u'), (List<UUID>) lst, true, UUID::toString);
-		else if (first instanceof Number) // Number identification character is upper case.
-			listAppend(key, builder.append(first.getClass().getSimpleName().charAt(0)), (List<Number>) lst, true, Object::toString);
-		else {
-			System.err.println("Unsupported list data of type " + first.getClass().getName());
-			return null;
+		builder.append('*');
+		switch (first) {
+			case String ignored -> strListAppend(key, builder, (List<String>) lst);
+			case Character ignored -> charListAppend(key, builder, (List<Character>) lst);
+			case Boolean ignored -> booleanListAppend(key, builder, (List<Boolean>) lst);
+			case UUID ignored -> listAppend(addKey(builder, 'u', key), lst, true, Object::toString);
+			case Number n -> numListAppend(key, builder, (List<Number>) lst, n);
+			case null, default -> { }
 		}
-		return builder.append('\n').toString();
 	}
 
-	private <T> String listAppend(String key, StringBuilder builder, List<T> lst, boolean separate, Function<T, String> modifier) {
-		builder.append(key).append(':');
+	private <T> String listAppend(final StringBuilder b, final List<T> lst, boolean separate, Function<T, String> modifier) {
 		final int size = lst.size() - 1;
 		for (int lstI = 0; lstI <= size; lstI++) {
-			builder.append(modifier.apply(lst.get(lstI)));
+			b.append(modifier.apply(lst.get(lstI)));
 			if (separate && lstI != size)
-				builder.append(',');
+				b.append(',');
 		}
 		// Result will be *?(key):(value), "*?" is appended on toWrite, with ? being the char of the list type.
-		return builder.toString();
+		return b.toString();
 	}
 
-	private String listAppend(String key, StringBuilder builder, List<CharSequence> lst) {
-		return listAppend(key, builder, lst, true, seq -> {
-			final int len = seq.length();
-			final StringBuilder seqBuilder = new StringBuilder(len);
-			// ',' chars inside strings will be marked with a '\' to avoid breaking load logic.
-			for (int seqI = 0; seqI < len; seqI++) {
-				final char ch = seq.charAt(seqI);
-				if (ch == ',')
-					seqBuilder.append("\\,");
-				else if (ch == '\n')
-					seqBuilder.append("\\n");
-				else
-					seqBuilder.append(ch);
+	private void numListAppend(final String key, final StringBuilder b, final List<Number> lst, final Number n) {
+		listAppend(addKey(b, getNumberId(n), key), lst, true, Object::toString);
+	}
+
+	private void booleanListAppend(final String key, final StringBuilder b, final List<Boolean> lst) {
+		listAppend(addKey(b, 'b', key), lst, false, bool -> bool ? "t" : "f");
+	}
+
+	private void charListAppend(final String key, final StringBuilder b, final List<Character> lst) {
+		listAppend(addKey(b, 'c', key), lst, false, c -> c == '\n' ? "\\n" : c.toString());
+	}
+
+	private void strListAppend(final String key, StringBuilder builder, List<String> lst) {
+		listAppend(addKey(builder, 's', key), lst, true, str -> {
+			final int len = str.length();
+			final StringBuilder strBuilder = new StringBuilder(len);
+			// NOTE: ',' chars inside strings will be marked with a '\' to avoid breaking load logic.
+			for (int i = 0; i < len; i++) {
+				final char ch = str.charAt(i);
+				if (ch == ',' || ch == '\n')
+					strBuilder.append("\\");
+				strBuilder.append(ch);
 			}
-			return seqBuilder.toString();
+			return strBuilder.toString();
 		});
 	}
 
