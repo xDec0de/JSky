@@ -18,11 +18,17 @@ public class TestJTags {
 
 	@Test
 	void testSimpleValidTag() {
-		final JTag[] tags = JTagParser.parse("<test:content>");
-		assertEquals(1, tags.length);
-		assertEquals("test", tags[0].getName());
-		assertEquals("content", tags[0].getContent());
-		assertEquals(0, tags[0].getChildren().length);
+		final JTag nameOnly = JTagParser.parseOne("<name>");
+		assertNotNull(nameOnly);
+		assertEquals("name", nameOnly.getName());
+		assertEquals("", nameOnly.getContent());
+		assertEquals(0, nameOnly.getChildren().length);
+
+		final JTag[] full = JTagParser.parse("<test:content>");
+		assertEquals(1, full.length);
+		assertEquals("test", full[0].getName());
+		assertEquals("content", full[0].getContent());
+		assertEquals(0, full[0].getChildren().length);
 	}
 
 	@Test
@@ -49,7 +55,8 @@ public class TestJTags {
 		assertEquals("second", second.getName());
 		assertEquals("second", second.getContent());
 		assertNull(JTagParser.parseOne("invalid"));
-		assertNull(JTagParser.parseOne("<invalid>"));
+		assertNull(JTagParser.parseOne("<>"));
+		assertNull(JTagParser.parseOne("< >"));
 		assertNull(JTagParser.parseOne("<invalid"));
 		assertNull(JTagParser.parseOne("invalid>"));
 		assertNull(JTagParser.parseOne(">invalid:brackets<"));
@@ -69,9 +76,9 @@ public class TestJTags {
 	}
 
 	@Test
-	void testInvalidTags() {
-		assertEquals(0, JTagParser.parse("<invalid>").length);
+	void testUnclosedTags() {
 		assertEquals(0, JTagParser.parse("<unclosed:content").length);
+		assertEquals(0, JTagParser.parse("<< >").length);
 	}
 
 	@Test
@@ -94,28 +101,18 @@ public class TestJTags {
 
 	@Test
 	void testMixedValidAndInvalid() {
-		final JTag[] tags = JTagParser.parse("<outer:<valid:ok><invalid><another:tag>>");
+		final JTag[] tags = JTagParser.parse("<outer:<valid:ok>< ><another:tag>>");
 		assertEquals(1, tags.length);
-		assertEquals("<invalid>", tags[0].getContent());
+		assertEquals("< >", tags[0].getContent());
 		assertEquals(2, tags[0].getChildren().length);
 	}
 
 	@Test
 	void testMultipleInvalidTags() {
-		final JTag[] tags = JTagParser.parse("<parent:<invalid1><valid:ok><invalid2>>");
+		final JTag[] tags = JTagParser.parse("<parent:< ><valid:ok><>>< >");
 		assertEquals(1, tags.length);
-		assertEquals("<invalid1><invalid2>", tags[0].getContent());
+		assertEquals("< ><>", tags[0].getContent());
 		assertEquals(1, tags[0].getChildren().length);
-	}
-
-	@Test
-	void testChildNotClosed() {
-		final JTag[] colon = JTagParser.parse("<parent:<not_closed>");
-		assertEquals(1, colon.length);
-		assertEquals("parent", colon[0].getName());
-		assertEquals("<not_closed", colon[0].getContent());
-		final JTag[] no_colon = JTagParser.parse("<parent<not_closed>");
-		assertEquals(0, no_colon.length);
 	}
 
 	@Test

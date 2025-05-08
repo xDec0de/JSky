@@ -23,23 +23,25 @@ public final class JTagParser {
 	 */
 
 	public static @NotNull JTag[] parse(@NotNull final String input) {
-		return parse(input, Integer.MAX_VALUE);
+		return parse(input, 0);
 	}
 
-	public static @NotNull JTag[] parse(@NotNull final String input, final int maxDepth) {
+	public static @NotNull JTag[] parse(@NotNull final String input, final int fromIndex) {
+		return parse(input, fromIndex, Integer.MAX_VALUE);
+	}
+
+	public static @NotNull JTag[] parse(@NotNull final String input, final int fromIndex, final int maxDepth) {
 		final List<JTag> tags = new ArrayList<>();
 		final int inputLen = input.length();
-		int index = 0;
+		int index = fromIndex;
 		while (index < inputLen) {
 			final int openBracket = findOpenBracket(input, index);
 			if (openBracket == -1)
 				break;
 			final int closeBracket = findCloseBracket(input, openBracket);
 			if (closeBracket == -1) {
-				if (input.indexOf('>') == -1)
-					return EMPTY_TAG_ARRAY;
-				final JTag tag = parseTag(input.substring(openBracket + 1, inputLen - 1), maxDepth);
-				return tag == null ? EMPTY_TAG_ARRAY : new JTag[] { tag };
+				index = openBracket + 1;
+				continue;
 			}
 			final String tagContent = input.substring(openBracket + 1, closeBracket);
 			final JTag tag = parseTag(tagContent, maxDepth);
@@ -77,17 +79,17 @@ public final class JTagParser {
 	 */
 
 	private static @Nullable JTag parseTag(@NotNull final String tagContent, final int maxDepth) {
+		if (!tagContent.contains(":"))
+			return tagContent.isBlank() ? null : new JTag(tagContent, "", EMPTY_TAG_ARRAY);
 		final int colonPos = tagContent.indexOf(':');
-		if (colonPos == -1)
-			return null;
 		final String name = tagContent.substring(0, colonPos).trim();
-		final String remaining = tagContent.substring(colonPos + 1);
-		if (name.isBlank() || remaining.isBlank())
+		final String content = tagContent.substring(colonPos + 1);
+		if (name.isBlank() || content.isBlank())
 			return null;
 		if (maxDepth <= 0)
-			return new JTag(name, unescapeBrackets(remaining), EMPTY_TAG_ARRAY);
+			return new JTag(name, unescapeBrackets(content), EMPTY_TAG_ARRAY);
 		final List<JTag> children = new ArrayList<>();
-		final String extracted = extractContent(remaining, children, maxDepth - 1);
+		final String extracted = extractContent(content, children, maxDepth - 1);
 		return new JTag(name, extracted, children.toArray(EMPTY_TAG_ARRAY));
 	}
 
@@ -107,19 +109,11 @@ public final class JTagParser {
 				break;
 			}
 			final String childContent = content.substring(openBracket + 1, closeBracket);
-			final int colonPos = childContent.indexOf(':');
-			if (colonPos == -1) {
-				result.append(content, openBracket, closeBracket + 1);
-				i = closeBracket + 1;
-				continue;
-			}
 			final JTag childTag = parseTag(childContent, remainingDepth);
-			if (childTag != null) {
+			if (childTag != null)
 				children.add(childTag);
-				i = closeBracket + 1;
-				continue;
-			}
-			result.append(content, openBracket, closeBracket + 1);
+			else
+				result.append(content, openBracket, closeBracket + 1);
 			i = closeBracket + 1;
 		}
 		return unescapeBrackets(result.toString());
