@@ -16,7 +16,17 @@ import java.util.List;
  */
 public final class JTagParser {
 
+	private static final JTag[] EMPTY_TAG_ARRAY = new JTag[0];
+
+	/*
+	 - Parse array
+	 */
+
 	public static @NotNull JTag[] parse(@NotNull final String input) {
+		return parse(input, Integer.MAX_VALUE);
+	}
+
+	public static @NotNull JTag[] parse(@NotNull final String input, final int maxDepth) {
 		final List<JTag> tags = new ArrayList<>();
 		final int inputLen = input.length();
 		int index = 0;
@@ -24,37 +34,49 @@ public final class JTagParser {
 			final int openBracket = findOpenBracket(input, index);
 			if (openBracket == -1)
 				break;
-			int closeBracket = findCloseBracket(input, openBracket);
+			final int closeBracket = findCloseBracket(input, openBracket);
 			if (closeBracket == -1) {
-				if (input.indexOf('>') == -1) // Parent tag not closed
-					return new JTag[0];
-				// Parent tag closed, but not with the right depth
-				final JTag tag = parseTag(input.substring(openBracket + 1, inputLen - 1));
-				return tag == null ? new JTag[0] : new JTag[] { tag };
+				if (input.indexOf('>') == -1)
+					return EMPTY_TAG_ARRAY;
+				final JTag tag = parseTag(input.substring(openBracket + 1, inputLen - 1), maxDepth);
+				return tag == null ? EMPTY_TAG_ARRAY : new JTag[] { tag };
 			}
 			final String tagContent = input.substring(openBracket + 1, closeBracket);
-			final JTag tag = parseTag(tagContent);
+			final JTag tag = parseTag(tagContent, maxDepth);
 			if (tag != null)
 				tags.add(tag);
 			index = closeBracket + 1;
 		}
-		return tags.toArray(new JTag[0]);
+		return tags.toArray(EMPTY_TAG_ARRAY);
 	}
 
-	public static @Nullable JTag parseOne(@NotNull final String input, int fromIndex) {
-		final int openBracket = findOpenBracket(input, fromIndex);
-		final int closeBracket = findCloseBracket(input, openBracket);
-		if (openBracket == -1 || closeBracket == -1)
-			return null;
-		return parseTag(input.substring(openBracket + 1, closeBracket));
-	}
+	/*
+	 - Parse one
+	 */
 
 	public static @Nullable JTag parseOne(@NotNull final String input) {
-		return parseOne(input, 0);
+		return parseOne(input, 0, Integer.MAX_VALUE);
 	}
 
-	@Nullable
-	private static JTag parseTag(@NotNull final String tagContent) {
+	public static @Nullable JTag parseOne(@NotNull final String input, final int fromIndex) {
+		return parseOne(input, fromIndex, Integer.MAX_VALUE);
+	}
+
+	public static @Nullable JTag parseOne(@NotNull final String input, final int fromIndex, final int maxDepth) {
+		final int openBracket = findOpenBracket(input, fromIndex);
+		if (openBracket == -1)
+			return null;
+		final int closeBracket = findCloseBracket(input, openBracket);
+		if (closeBracket == -1)
+			return null;
+		return parseTag(input.substring(openBracket + 1, closeBracket), maxDepth);
+	}
+
+	/*
+	 - Tag parsing
+	 */
+
+	private static @Nullable JTag parseTag(@NotNull final String tagContent, final int maxDepth) {
 		final int colonPos = tagContent.indexOf(':');
 		if (colonPos == -1)
 			return null;
@@ -62,13 +84,14 @@ public final class JTagParser {
 		final String remaining = tagContent.substring(colonPos + 1);
 		if (name.isBlank() || remaining.isBlank())
 			return null;
+		if (maxDepth <= 0)
+			return new JTag(name, unescapeBrackets(remaining), EMPTY_TAG_ARRAY);
 		final List<JTag> children = new ArrayList<>();
-		final String extracted = extractContent(remaining, children);
-		return new JTag(name, extracted, children.toArray(new JTag[0]));
+		final String extracted = extractContent(remaining, children, maxDepth - 1);
+		return new JTag(name, extracted, children.toArray(EMPTY_TAG_ARRAY));
 	}
 
-	@NotNull
-	private static String extractContent(@NotNull final String content, @NotNull final List<JTag> children) {
+	private static @NotNull String extractContent(@NotNull final String content, @NotNull final List<JTag> children, final int remainingDepth) {
 		final StringBuilder result = new StringBuilder();
 		int i = 0;
 		while (i < content.length()) {
@@ -90,11 +113,21 @@ public final class JTagParser {
 				i = closeBracket + 1;
 				continue;
 			}
-			children.add(parseTag(childContent));
+			final JTag childTag = parseTag(childContent, remainingDepth);
+			if (childTag != null) {
+				children.add(childTag);
+				i = closeBracket + 1;
+				continue;
+			}
+			result.append(content, openBracket, closeBracket + 1);
 			i = closeBracket + 1;
 		}
-		return result.toString().replace("\\<", "<").replace("\\>", ">");
+		return unescapeBrackets(result.toString());
 	}
+
+	/*
+	 - Bracket utility
+	 */
 
 	private static int findOpenBracket(@NotNull final String str, final int fromIndex) {
 		int i = fromIndex;
@@ -122,5 +155,9 @@ public final class JTagParser {
 			pos++;
 		}
 		return depth == 0 ? pos - 1 : -1;
+	}
+
+	private static String unescapeBrackets(@NotNull final String str) {
+		return str.replace("\\<", "<").replace("\\>", ">");
 	}
 }
