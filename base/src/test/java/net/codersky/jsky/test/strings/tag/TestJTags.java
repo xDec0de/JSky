@@ -131,4 +131,39 @@ public class TestJTags {
 		assertEquals(1, tags.length);
 		assertEquals("<c:\\<d\\>>", tags[0].getChildren()[0].getContent());
 	}
+
+	@Test
+	void testInvalidChildContent() {
+		final JTag noName = JTagParser.parseOne("<parent:content<:invalid>>");
+		assertNotNull(noName);
+		assertEquals("content<:invalid>", noName.getContent());
+		assertEquals(0, noName.getChildren().length);
+
+		final JTag blankName = JTagParser.parseOne("<parent:content< :value>>");
+		assertNotNull(blankName);
+		assertEquals("content< :value>", blankName.getContent());
+		assertEquals(0, blankName.getChildren().length);
+
+		final JTag blankContent = JTagParser.parseOne("<parent:content<child: >>");
+		assertNotNull(blankContent);
+		assertEquals("content<child: >", blankContent.getContent());
+		assertEquals(0, blankContent.getChildren().length);
+	}
+
+	@Test
+	void testDepthLimit() {
+		final JTag depth0 = JTagParser.parseOne("<root:<child:value>>", 0, 0);
+		assertNotNull(depth0);
+		assertEquals("<child:value>", depth0.getContent());
+		assertEquals(0, depth0.getChildren().length);
+
+		final JTag depth1 = JTagParser.parseOne("<root:<child:value>>", 0, 1);
+		assertNotNull(depth1);
+		assertEquals("", depth1.getContent());
+		assertEquals(1, depth1.getChildren().length);
+
+		final JTag depth1Nested = JTagParser.parseOne("<root:<child:<grand:value>>>", 0, 1);
+		assertNotNull(depth1Nested);
+		assertEquals("<grand:value>", depth1Nested.getChildren()[0].getContent());
+	}
 }
