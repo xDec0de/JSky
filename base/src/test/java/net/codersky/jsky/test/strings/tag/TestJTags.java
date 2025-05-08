@@ -163,4 +163,23 @@ public class TestJTags {
 		assertNotNull(depth1Nested);
 		assertEquals("<grand:value>", depth1Nested.getChildren()[0].getContent());
 	}
+
+	@Test
+	void testExcessContent() {
+		StringBuilder excess = new StringBuilder();
+		JTagParser.parseOne("<basic_tag>Excess", excess);
+		assertEquals("Excess", excess.toString());
+
+		excess = new StringBuilder();
+		JTagParser.parseOne("No tag", 3, excess);
+		assertEquals("tag", excess.toString());
+
+		excess = new StringBuilder();
+		JTagParser.parse("w<one><two:2>o<nest:<egg>>w", excess);
+		assertEquals("wow", excess.toString());
+
+		excess = new StringBuilder();
+		JTagParser.parse("w<one><two:2>o<nest:<egg>>w", 1, excess);
+		assertEquals("ow", excess.toString());
+	}
 }

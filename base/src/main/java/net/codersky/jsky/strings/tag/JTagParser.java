@@ -23,21 +23,38 @@ public final class JTagParser {
 	 */
 
 	public static @NotNull JTag[] parse(@NotNull final String input) {
-		return parse(input, 0);
+		return parse(input, 0, Integer.MAX_VALUE, null);
 	}
 
 	public static @NotNull JTag[] parse(@NotNull final String input, final int fromIndex) {
-		return parse(input, fromIndex, Integer.MAX_VALUE);
+		return parse(input, fromIndex, Integer.MAX_VALUE, null);
 	}
 
 	public static @NotNull JTag[] parse(@NotNull final String input, final int fromIndex, final int maxDepth) {
+		return parse(input, fromIndex, maxDepth, null);
+	}
+
+	public static @NotNull JTag[] parse(@NotNull final String input, @Nullable final StringBuilder excess) {
+		return parse(input, 0, Integer.MAX_VALUE, excess);
+	}
+
+	public static @NotNull JTag[] parse(@NotNull final String input, final int fromIndex, @Nullable final StringBuilder excess) {
+		return parse(input, fromIndex, Integer.MAX_VALUE, excess);
+	}
+
+	public static @NotNull JTag[] parse(@NotNull final String input, final int fromIndex, final int maxDepth, @Nullable final StringBuilder excess) {
 		final List<JTag> tags = new ArrayList<>();
 		final int inputLen = input.length();
 		int index = fromIndex;
 		while (index < inputLen) {
 			final int openBracket = findOpenBracket(input, index);
-			if (openBracket == -1)
+			if (openBracket == -1) {
+				if (excess != null && index < inputLen)
+					excess.append(input.substring(index));
 				break;
+			}
+			if (excess != null && index < openBracket)
+				excess.append(input.substring(index, openBracket));
 			final int closeBracket = findCloseBracket(input, openBracket);
 			if (closeBracket == -1) {
 				index = openBracket + 1;
@@ -57,20 +74,39 @@ public final class JTagParser {
 	 */
 
 	public static @Nullable JTag parseOne(@NotNull final String input) {
-		return parseOne(input, 0, Integer.MAX_VALUE);
+		return parseOne(input, 0, Integer.MAX_VALUE, null);
 	}
 
 	public static @Nullable JTag parseOne(@NotNull final String input, final int fromIndex) {
-		return parseOne(input, fromIndex, Integer.MAX_VALUE);
+		return parseOne(input, fromIndex, Integer.MAX_VALUE, null);
 	}
 
 	public static @Nullable JTag parseOne(@NotNull final String input, final int fromIndex, final int maxDepth) {
+		return parseOne(input, fromIndex, maxDepth, null);
+	}
+
+	public static @Nullable JTag parseOne(@NotNull final String input, @Nullable final StringBuilder excess) {
+		return parseOne(input, 0, Integer.MAX_VALUE, excess);
+	}
+
+	public static @Nullable JTag parseOne(@NotNull final String input, final int fromIndex, @Nullable final StringBuilder excess) {
+		return parseOne(input, fromIndex, Integer.MAX_VALUE, excess);
+	}
+
+	public static @Nullable JTag parseOne(@NotNull final String input, final int fromIndex, final int maxDepth, @Nullable final StringBuilder excess) {
 		final int openBracket = findOpenBracket(input, fromIndex);
-		if (openBracket == -1)
+		if (openBracket == -1) {
+			if (excess != null && fromIndex < input.length())
+				excess.append(input.substring(fromIndex));
 			return null;
+		}
+		if (excess != null && fromIndex < openBracket)
+			excess.append(input, fromIndex, openBracket);
 		final int closeBracket = findCloseBracket(input, openBracket);
 		if (closeBracket == -1)
 			return null;
+		if (excess != null && closeBracket + 1 < input.length())
+			excess.append(input.substring(closeBracket + 1));
 		return parseTag(input.substring(openBracket + 1, closeBracket), maxDepth);
 	}
 
