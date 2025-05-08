@@ -34,6 +34,10 @@ public final class JTagParser {
 		return parse(input, fromIndex, maxDepth, null);
 	}
 
+	/*
+	 - Parse array - Excess StringBuilder
+	 */
+
 	public static @NotNull JTag[] parse(@NotNull final String input, @Nullable final StringBuilder excess) {
 		return parse(input, 0, Integer.MAX_VALUE, excess);
 	}
@@ -44,28 +48,17 @@ public final class JTagParser {
 
 	public static @NotNull JTag[] parse(@NotNull final String input, final int fromIndex, final int maxDepth, @Nullable final StringBuilder excess) {
 		final List<JTag> tags = new ArrayList<>();
-		final int inputLen = input.length();
-		int index = fromIndex;
-		while (index < inputLen) {
-			final int openBracket = findOpenBracket(input, index);
-			if (openBracket == -1) {
-				if (excess != null && index < inputLen)
-					excess.append(input.substring(index));
+		StringBuilder builder = new StringBuilder(input.substring(fromIndex));
+		while (true) {
+			final String current = builder.toString();
+			builder = new StringBuilder();
+			final JTag tag = parseOne(current, 0, maxDepth, builder);
+			if (tag == null)
 				break;
-			}
-			if (excess != null && index < openBracket)
-				excess.append(input.substring(index, openBracket));
-			final int closeBracket = findCloseBracket(input, openBracket);
-			if (closeBracket == -1) {
-				index = openBracket + 1;
-				continue;
-			}
-			final String tagContent = input.substring(openBracket + 1, closeBracket);
-			final JTag tag = parseTag(tagContent, maxDepth);
-			if (tag != null)
-				tags.add(tag);
-			index = closeBracket + 1;
+			tags.add(tag);
 		}
+		if (excess != null)
+			excess.append(builder);
 		return tags.toArray(EMPTY_TAG_ARRAY);
 	}
 
@@ -84,6 +77,10 @@ public final class JTagParser {
 	public static @Nullable JTag parseOne(@NotNull final String input, final int fromIndex, final int maxDepth) {
 		return parseOne(input, fromIndex, maxDepth, null);
 	}
+
+	/*
+	 - Parse one - Excess StringBuilder
+	 */
 
 	public static @Nullable JTag parseOne(@NotNull final String input, @Nullable final StringBuilder excess) {
 		return parseOne(input, 0, Integer.MAX_VALUE, excess);
