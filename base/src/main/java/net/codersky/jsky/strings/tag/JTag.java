@@ -1,6 +1,7 @@
 package net.codersky.jsky.strings.tag;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
@@ -48,5 +49,20 @@ public class JTag {
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public String toString() {
+		return String.format("JTag{name=\"%s\", content=\"%s\", children=[%s]}",
+				getName(), getContent(), childrenToStr());
+	}
+
+	private String childrenToStr() {
+		if (getChildren().length == 0)
+			return "";
+		final StringBuilder children = new StringBuilder();
+		for (final JTag child : getChildren())
+			(children.isEmpty() ? children : children.append(", ")).append(child);
+		return children.toString();
 	}
 }
