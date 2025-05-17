@@ -1,185 +1,103 @@
 package net.codersky.jsky.test.strings.tag;
 
 import net.codersky.jsky.strings.tag.JTag;
-import net.codersky.jsky.strings.tag.JTagParser;
+import net.codersky.jsky.strings.tag.JTagParseAllResult;
+import net.codersky.jsky.strings.tag.JTagParseResult;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
+import static net.codersky.jsky.strings.tag.JTagParser.parse;
+import static net.codersky.jsky.strings.tag.JTagParser.parseAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class TestJTags {
 
+	/*
+	 - Parse
+	 */
+
 	@Test
-	void testUnrelatedInput() {
-		assertEquals(0, JTagParser.parse("").length);
-		assertEquals(0, JTagParser.parse("Random string").length);
+	void testNoTags() {
+		test(parse("No tags"), "No tags", null, "");
+		test(parse(""), "", null, "");
 	}
 
 	@Test
-	void testSimpleValidTag() {
-		final JTag nameOnly = JTagParser.parseOne("<name>");
-		assertNotNull(nameOnly);
-		assertEquals("name", nameOnly.getName());
-		assertEquals("", nameOnly.getContent());
-		assertEquals(0, nameOnly.getChildren().length);
-
-		final JTag[] full = JTagParser.parse("<test:content>");
-		assertEquals(1, full.length);
-		assertEquals("test", full[0].getName());
-		assertEquals("content", full[0].getContent());
-		assertEquals(0, full[0].getChildren().length);
+	void testSimpleTags() {
+		test(parse("<simple>"), "", new JTag("simple"), "");
+		test(parse("a<simple>b"), "a", new JTag("simple"), "b");
+		test(parse("<tag:content>"), "", new JTag("tag", "content"), "");
+		// Simple nested tag
+		JTag nested = new JTag("c");
+		JTag parent = new JTag("a", "b", new JTag[] { nested });
+		test(parse("<a:b<c>>"), "", parent, "");
+		// Content nested tag
+		nested = new JTag("c", "d");
+		parent = new JTag("a", "b", new JTag[] { nested });
+		test(parse("<a:b<c:d>>"), "", parent, "");
 	}
 
 	@Test
-	void testMultipleParents() {
-		final JTag[] tags = JTagParser.parse("<one:one><two:two><three:three>");
-		assertEquals(3, tags.length);
-		assertEquals("one", tags[0].getName());
-		assertEquals("one", tags[0].getContent());
-		assertEquals("two", tags[1].getContent());
-		assertEquals("two", tags[1].getContent());
-		assertEquals("three", tags[2].getContent());
-		assertEquals("three", tags[2].getContent());
-	}
-
-	@Test
-	void testParseOne() {
-		final String input = "a<first:first><second:second>";
-		final JTag first = JTagParser.parseOne(input);
-		assertNotNull(first);
-		assertEquals("first", first.getName());
-		assertEquals("first", first.getContent());
-		final JTag second = JTagParser.parseOne(input, 14);
-		assertNotNull(second);
-		assertEquals("second", second.getName());
-		assertEquals("second", second.getContent());
-		assertNull(JTagParser.parseOne("invalid"));
-		assertNull(JTagParser.parseOne("<>"));
-		assertNull(JTagParser.parseOne("< >"));
-		assertNull(JTagParser.parseOne("<invalid"));
-		assertNull(JTagParser.parseOne("invalid>"));
-		assertNull(JTagParser.parseOne(">invalid:brackets<"));
-		assertNull(JTagParser.parseOne("<blank_content: >"));
-		assertNull(JTagParser.parseOne("< :blank_name>"));
-	}
-
-	@Test
-	void testNestedValidTags() {
-		final JTag[] tags = JTagParser.parse("<parent:content<child:sub>>");
-		assertEquals(1, tags.length);
-		assertEquals("parent", tags[0].getName());
-		assertEquals("content", tags[0].getContent());
-		assertEquals(1, tags[0].getChildren().length);
-		assertEquals("child", tags[0].getChildren()[0].getName());
-		assertEquals("sub", tags[0].getChildren()[0].getContent());
+	void testEscape() {
+		test(parse("\\<Escape\\>"), "<Escape>", null, "");
+		test(parse("<\\\\>"), "", new JTag("\\"), "");
+		test(parse("<\\\\:\\\\>"), "", new JTag("\\", "\\"), "");
+		test(parse("\\\\<\\\\:\\\\>\\\\"), "\\", new JTag("\\", "\\"), "\\");
 	}
 
 	@Test
 	void testUnclosedTags() {
-		assertEquals(0, JTagParser.parse("<unclosed:content").length);
-		assertEquals(0, JTagParser.parse("<< >").length);
+		// One
+		test(parse("\\<unclosed"), "<unclosed", null, "");
+		test(parse("<unclosed"), "<unclosed", null, "");
+		test(parse("unclosed\\>"), "unclosed>", null, "");
+		test(parse("unclosed>"), "unclosed>", null, "");
+		// Nested
+		test(parse("<tag<unclosed>"), "<tag<unclosed>", null, "");
+		test(parse("<tag:<unclosed>"), "<tag:<unclosed>", null, "");
 	}
 
 	@Test
-	void testEscapedBracketsInContent() {
-		final JTag[] tags = JTagParser.parse("<tag:escaped\\<brackets\\>>");
-		assertEquals(1, tags.length);
-		assertEquals("tag", tags[0].getName());
-		assertEquals("escaped<brackets>", tags[0].getContent());
+	void testBlankTags() {
+		// One
+		test(parse("< >"), "< >", null, "");
+		test(parse("<a: >"), "<a: >", null, "");
+		test(parse("< :a>"), "< :a>", null, "");
+		test(parse("< : >"), "< : >", null, "");
+		// Nested
+		test(parse("<a:< : >>"), "", new JTag("a", "< : >"), "");
 	}
 
 	@Test
-	void testDeeplyNestedTags() {
-		final JTag[] tags = JTagParser.parse("<a:<b:<c:d>>>");
-		assertEquals(1, tags.length);
-		assertEquals("a", tags[0].getName());
-		assertEquals(1, tags[0].getChildren().length);
-		assertEquals("b", tags[0].getChildren()[0].getName());
-		assertEquals(1, tags[0].getChildren()[0].getChildren().length);
+	void testNestLimt() {
+		test(parse("<a:b<c:d>>", 0, 0), "", new JTag("a", "b<c:d>"), "");
 	}
 
+	/*
+	 - Parse all
+	 */
+
 	@Test
-	void testMixedValidAndInvalid() {
-		final JTag[] tags = JTagParser.parse("<outer:<valid:ok>< ><another:tag>>");
-		assertEquals(1, tags.length);
-		assertEquals("< >", tags[0].getContent());
-		assertEquals(2, tags[0].getChildren().length);
+	void testParseAll() {
+		final JTagParseAllResult res = parseAll("<a:b>c<d:e>f");
+		assertEquals(new JTag("a", "b"), res.getTag(0));
+		assertEquals("c", res.getString(1));
+		assertEquals(new JTag("d", "e"), res.getTag(2));
+		assertEquals("f", res.getString(3));
 	}
 
-	@Test
-	void testMultipleInvalidTags() {
-		final JTag[] tags = JTagParser.parse("<parent:< ><valid:ok><>>< >");
-		assertEquals(1, tags.length);
-		assertEquals("< ><>", tags[0].getContent());
-		assertEquals(1, tags[0].getChildren().length);
-	}
+	/*
+	 - Util
+	 */
 
-	@Test
-	void testMultipleEscapedBrackets() {
-		final JTag[] tags = JTagParser.parse("<test:\\\\<escaped\\\\>>");
-		assertEquals(1, tags.length);
-		assertEquals("\\<escaped\\>", tags[0].getContent());
-	}
-
-	@Test
-	void testDeeplyNestedWithEscapes() {
-		final JTag[] tags = JTagParser.parse("<a:<b:\\<c:\\\\<d\\\\>\\>>>");
-		assertEquals(1, tags.length);
-		assertEquals("<c:\\<d\\>>", tags[0].getChildren()[0].getContent());
-	}
-
-	@Test
-	void testInvalidChildContent() {
-		final JTag noName = JTagParser.parseOne("<parent:content<:invalid>>");
-		assertNotNull(noName);
-		assertEquals("content<:invalid>", noName.getContent());
-		assertEquals(0, noName.getChildren().length);
-
-		final JTag blankName = JTagParser.parseOne("<parent:content< :value>>");
-		assertNotNull(blankName);
-		assertEquals("content< :value>", blankName.getContent());
-		assertEquals(0, blankName.getChildren().length);
-
-		final JTag blankContent = JTagParser.parseOne("<parent:content<child: >>");
-		assertNotNull(blankContent);
-		assertEquals("content<child: >", blankContent.getContent());
-		assertEquals(0, blankContent.getChildren().length);
-	}
-
-	@Test
-	void testDepthLimit() {
-		final JTag depth0 = JTagParser.parseOne("<root:<child:value>>", 0, 0);
-		assertNotNull(depth0);
-		assertEquals("<child:value>", depth0.getContent());
-		assertEquals(0, depth0.getChildren().length);
-
-		final JTag depth1 = JTagParser.parseOne("<root:<child:value>>", 0, 1);
-		assertNotNull(depth1);
-		assertEquals("", depth1.getContent());
-		assertEquals(1, depth1.getChildren().length);
-
-		final JTag depth1Nested = JTagParser.parseOne("<root:<child:<grand:value>>>", 0, 1);
-		assertNotNull(depth1Nested);
-		assertEquals("<grand:value>", depth1Nested.getChildren()[0].getContent());
-	}
-
-	@Test
-	void testExcessContent() {
-		StringBuilder excess = new StringBuilder();
-		JTagParser.parseOne("<basic_tag>Excess", excess);
-		assertEquals("Excess", excess.toString());
-
-		excess = new StringBuilder();
-		JTagParser.parseOne("No tag", 3, excess);
-		assertEquals("tag", excess.toString());
-
-		excess = new StringBuilder();
-		JTagParser.parse("w<one><two:2>o<nest:<egg>>w", excess);
-		assertEquals("wow", excess.toString());
-
-		excess = new StringBuilder();
-		JTagParser.parse("w<one><two:2>o<nest:<egg>>w", 1, excess);
-		assertEquals("ow", excess.toString());
+	private void test(@NotNull JTagParseResult result, String skipped, JTag tag, String remaining) {
+		assertEquals(skipped, result.getSkipped());
+		if (tag != null && result.getTag() != null && !tag.equals(result.getTag())) {
+			System.out.println("Tag test failed (+ Expected vs - result):");
+			System.out.println("+ " + tag);
+			System.out.println("- " + result.getTag());
+		}
+		assertEquals(tag, result.getTag());
+		assertEquals(remaining, result.getRemaining());
 	}
 }
