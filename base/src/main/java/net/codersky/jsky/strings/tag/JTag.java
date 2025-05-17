@@ -17,6 +17,14 @@ public class JTag {
 		this.children = Objects.requireNonNull(children);
 	}
 
+	public JTag(@NotNull String name, @NotNull String content) {
+		this(name, content, JTagParser.EMPTY_TAG_ARRAY);
+	}
+
+	public JTag(@NotNull String name) {
+		this(name, "");
+	}
+
 	@NotNull
 	public String getName() {
 		return name;
