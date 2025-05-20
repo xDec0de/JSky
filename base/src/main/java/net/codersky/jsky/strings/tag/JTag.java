@@ -3,6 +3,7 @@ package net.codersky.jsky.strings.tag;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 public class JTag {
@@ -49,12 +50,7 @@ public class JTag {
 				return false;
 			if (!Objects.equals(getContent(), other.getContent()))
 				return false;
-			if (getChildren().length != other.getChildren().length)
-				return false;
-			for (int i = 0; i < getChildren().length; i++)
-				if (!getChildren()[i].equals(other.getChildren()[i]))
-					return false;
-			return true;
+			return Arrays.equals(getChildren(), other.getChildren());
 		}
 		return false;
 	}

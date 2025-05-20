@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import static net.codersky.jsky.strings.tag.JTagParser.parse;
 import static net.codersky.jsky.strings.tag.JTagParser.parseAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestJTags {
 
@@ -105,6 +107,33 @@ public class TestJTags {
 		final JTag two_nested = parse("<a:b<a:b><a:b>>").getTag();
 		assertNotNull(two_nested);
 		assertEquals(pre + "[" + pre + "[]}, " + pre + "[]}]}", two_nested.toString());
+	}
+
+	/*
+	 - Equals
+	 */
+
+	@Test
+	void testEquals() {
+		final JTag ab = new JTag("a", "b");
+		final JTag aa = new JTag("a", "a");
+		final JTag bb = new JTag("b", "b");
+		// Same instance
+		assertEquals(aa, aa);
+		// Unrelated
+		assertNotEquals(aa, "aa");
+		// Different name
+		assertNotEquals(ab, bb);
+		// Different content
+		assertNotEquals(ab, aa);
+		// Different children length
+		final JTag two_children = new JTag("c", "", new JTag[] {aa, bb});
+		final JTag aa_child = new JTag("c", "", new JTag[] {aa});
+		assertNotEquals(two_children, aa_child);
+		// Different children
+		assertNotEquals(aa_child, new JTag("c", "", new JTag[] {bb}));
+		// Same children
+		assertEquals(aa_child, new JTag("c", "", new JTag[] {aa}));
 	}
 
 	/*
