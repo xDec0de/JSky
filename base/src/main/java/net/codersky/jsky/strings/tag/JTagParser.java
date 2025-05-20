@@ -112,7 +112,7 @@ public final class JTagParser {
 				children.add(childTag);
 			else
 				result.append(content, openBracket, closeBracket);
-			i = closeBracket + 1;
+			i = closeBracket;
 		}
 		return result.toString();
 	}
