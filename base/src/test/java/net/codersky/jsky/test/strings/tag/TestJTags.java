@@ -87,16 +87,32 @@ public class TestJTags {
 	}
 
 	/*
+	 - To string
+	 */
+
+	@Test
+	void testToString() {
+		final String pre = "JTag{name=\"a\", content=\"b\", children=";
+
+		final JTag simple = parse("<a:b>").getTag();
+		assertNotNull(simple);
+		assertEquals( pre + "[]}", simple.toString());
+
+		final JTag nested = parse("<a:b<a:b>>").getTag();
+		assertNotNull(nested);
+		assertEquals(pre + "[" + pre + "[]}]}", nested.toString());
+
+		final JTag two_nested = parse("<a:b<a:b><a:b>>").getTag();
+		assertNotNull(two_nested);
+		assertEquals(pre + "[" + pre + "[]}, " + pre + "[]}]}", two_nested.toString());
+	}
+
+	/*
 	 - Util
 	 */
 
 	private void test(@NotNull JTagParseResult result, String skipped, JTag tag, String remaining) {
 		assertEquals(skipped, result.getSkipped());
-		if (tag != null && result.getTag() != null && !tag.equals(result.getTag())) {
-			System.out.println("Tag test failed (+ Expected vs - result):");
-			System.out.println("+ " + tag);
-			System.out.println("- " + result.getTag());
-		}
 		assertEquals(tag, result.getTag());
 		assertEquals(remaining, result.getRemaining());
 	}
