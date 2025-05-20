@@ -81,14 +81,14 @@ public final class JTagParser {
 			return tagContent.isBlank() ? null : new JTag(unescape(tagContent), "", EMPTY_TAG_ARRAY);
 		final int colonPos = tagContent.indexOf(':');
 		final String name = unescape(tagContent.substring(0, colonPos).trim());
-		final String content = unescape(tagContent.substring(colonPos + 1));
-		if (name.isBlank() || content.isBlank())
+		final String rawContent = tagContent.substring(colonPos + 1);
+		if (name.isBlank() || rawContent.isBlank())
 			return null;
 		if (maxDepth <= 0)
-			return new JTag(name, content, EMPTY_TAG_ARRAY);
+			return new JTag(name, unescape(rawContent), EMPTY_TAG_ARRAY);
 		final List<JTag> children = new ArrayList<>();
-		final String extracted = extractContent(content, children, maxDepth - 1);
-		return new JTag(name, extracted, children.toArray(EMPTY_TAG_ARRAY));
+		final String extracted = extractContent(rawContent, children, maxDepth - 1);
+		return new JTag(name, unescape(extracted), children.toArray(EMPTY_TAG_ARRAY));
 	}
 
 	private static @NotNull String extractContent(@NotNull final String content, @NotNull final List<JTag> children, final int remainingDepth) {
@@ -114,7 +114,7 @@ public final class JTagParser {
 				result.append(content, openBracket, closeBracket);
 			i = closeBracket + 1;
 		}
-		return unescape(result.toString());
+		return result.toString();
 	}
 
 	/*
