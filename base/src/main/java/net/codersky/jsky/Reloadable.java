@@ -5,6 +5,8 @@ package net.codersky.jsky;
  * the {@link #reload()} method for any type of object that may be reloaded.
  *
  * @author xDec0de_
+ *
+ * @since JSky 1.0.0
  */
 @FunctionalInterface
 public interface Reloadable {
@@ -14,6 +16,8 @@ public interface Reloadable {
 	 * this may take some time, so keep that in mind.
 	 *
 	 * @return {@code true} if the reload was successful, {@code false} otherwise.
+	 *
+	 * @since JSky 1.0.0
 	 */
 	boolean reload();
 }
