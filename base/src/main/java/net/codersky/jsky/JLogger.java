@@ -3,6 +3,7 @@ package net.codersky.jsky;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
@@ -19,6 +20,17 @@ public class JLogger implements System.Logger {
 
 	private final Logger logger;
 
+	/**
+	 * Creates a new {@link JLogger} with the provided {@code name}.
+	 * {@link Logger#getLogger(String)} is used to create the internal
+	 * logger, check that method for more details.
+	 *
+	 * @param name The name of the logger.
+	 *
+	 * @throws NullPointerException if {@code name} is {@code null}.
+	 *
+	 * @since JSky 1.0.0
+	 */
 	public JLogger(final @NotNull String name) {
 		this.logger = Logger.getLogger(name);
 	}
@@ -37,17 +49,19 @@ public class JLogger implements System.Logger {
 	 - Log level
 	 */
 
-	public void setLevel(final @NotNull Level level) {
+	@NotNull
+	public JLogger setLevel(@NotNull final Level level) {
 		logger.setLevel(toJUL(level));
+		return this;
 	}
 
 	@Override
-	public boolean isLoggable(Level level) {
+	public boolean isLoggable(@NotNull final Level level) {
 		return logger.isLoggable(toJUL(level));
 	}
 
-	private java.util.logging.Level toJUL(Level level) {
-		return switch (level) {
+	private java.util.logging.Level toJUL(@NotNull final Level level) {
+		return switch (Objects.requireNonNull(level)) {
 			case ALL -> java.util.logging.Level.ALL;
 			case TRACE -> java.util.logging.Level.FINEST;
 			case DEBUG -> java.util.logging.Level.FINE;
@@ -63,9 +77,9 @@ public class JLogger implements System.Logger {
 	 */
 
 	@Override
-	public void log(Level level, ResourceBundle bundle, String msg, Throwable thrown) {
+	public void log(@NotNull Level level, ResourceBundle bundle, String message, Throwable thrown) {
 		if (isLoggable(level))
-			logger.log(toJUL(level), msg, thrown);
+			logger.log(toJUL(level), message, thrown);
 	}
 
 	@Override
@@ -81,13 +95,13 @@ public class JLogger implements System.Logger {
 	}
 
 	@Override
-	public void log(@NotNull Level level, @Nullable String msg) {
-		log(level, null, msg, (Throwable) null);
+	public void log(@NotNull Level level, @Nullable String message) {
+		log(level, null, message, (Throwable) null);
 	}
 
 	@Override
-	public void log(@NotNull Level level, String msg, Throwable thrown) {
-		log(level, null, msg, thrown);
+	public void log(@NotNull Level level, String message, Throwable thrown) {
+		log(level, null, message, thrown);
 	}
 
 	@Override
@@ -99,55 +113,59 @@ public class JLogger implements System.Logger {
 	 - Debug
 	 */
 
-	public void setDebugLevel() {
-		setLevel(Level.DEBUG);
+	@NotNull
+	public JLogger setDebugLevel() {
+		return setLevel(Level.DEBUG);
 	}
 
-	public void debug(@Nullable String msg) {
-		log(Level.DEBUG, msg);
+	public void debug(@Nullable String message) {
+		log(Level.DEBUG, message);
 	}
 
-	public void debug(@Nullable String msg, @Nullable Object @Nullable ... params) {
-		log(Level.DEBUG, msg, params);
+	public void debug(@Nullable String message, @Nullable Object @Nullable ... params) {
+		log(Level.DEBUG, message, params);
 	}
 
 	/*
 	 - Info
 	 */
 
-	public void setInfoLevel() {
-		setLevel(Level.INFO);
+	@NotNull
+	public JLogger setInfoLevel() {
+		return setLevel(Level.INFO);
 	}
 
-	public void info(@Nullable String msg) {
-		log(Level.INFO, msg);
+	public void info(@Nullable String message) {
+		log(Level.INFO, message);
 	}
 
 	/*
 	 - Warning
 	 */
 
-	public void setWarningLevel() {
-		setLevel(Level.WARNING);
+	@NotNull
+	public JLogger setWarningLevel() {
+		return setLevel(Level.WARNING);
 	}
 
-	public void warning(@Nullable String msg) {
-		log(Level.WARNING, msg);
+	public void warning(@Nullable String message) {
+		log(Level.WARNING, message);
 	}
 
 	/*
 	 - Error
 	 */
 
-	public void setErrorLevel() {
-		setLevel(Level.ERROR);
+	@NotNull
+	public JLogger setErrorLevel() {
+		return setLevel(Level.ERROR);
 	}
 
-	public void error(@Nullable String msg) {
-		log(Level.ERROR, msg);
+	public void error(@Nullable String message) {
+		log(Level.ERROR, message);
 	}
 
-	public void error(@Nullable String msg, @Nullable Throwable thrown) {
-		log(Level.ERROR, msg, thrown);
+	public void error(@Nullable String message, @Nullable Throwable thrown) {
+		log(Level.ERROR, message, thrown);
 	}
 }
