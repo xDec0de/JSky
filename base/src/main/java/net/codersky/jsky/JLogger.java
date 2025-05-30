@@ -39,6 +39,13 @@ public class JLogger implements System.Logger {
 	 - Logger identification
 	 */
 
+	/**
+	 * Gets the name of this logger.
+	 *
+	 * @return The name of this logger, never {@code null}.
+	 *
+	 * @since JSky 1.0.0
+	 */
 	@NotNull
 	@Override
 	public String getName() {
@@ -49,12 +56,39 @@ public class JLogger implements System.Logger {
 	 - Log level
 	 */
 
+	/**
+	 * Sets the logging {@link Level level} of this {@link JLogger}
+	 * to the provided {@code level}. Messages with a lower
+	 * {@link Level#getSeverity() severity} will be discarded.
+	 *
+	 * @param level The new {@link Level} of this {@link JLogger}.
+	 *
+	 * @return This {@link JLogger}.
+	 *
+	 * @throws NullPointerException if {@code level} is {@code null}.
+	 *
+	 * @since JSky 1.0.0
+	 */
 	@NotNull
 	public JLogger setLevel(@NotNull final Level level) {
 		logger.setLevel(toJUL(level));
 		return this;
 	}
 
+	/**
+	 * Checks whether the provided {@code level} would
+	 * be logged or not according to the current log
+	 * {@link Level level} of this {@link JLogger}.
+	 *
+	 * @param level The {@link Level level} to check.
+	 *
+	 * @return {@code true} if a message at the provided
+	 * {@code level} would be logged, {@code false} otherwise.
+	 *
+	 * @throws NullPointerException if {@code level} is {@code null}.
+	 *
+	 * @since JSky 1.0.0
+	 */
 	@Override
 	public boolean isLoggable(@NotNull final Level level) {
 		return logger.isLoggable(toJUL(level));
@@ -113,6 +147,14 @@ public class JLogger implements System.Logger {
 	 - Debug
 	 */
 
+	/**
+	 * Shortcut to {@link #setLevel(Level) set the level}
+	 * of this {@link JLogger} to {@link Level#DEBUG DEBUG}.
+	 *
+	 * @return This {@link JLogger}
+	 *
+	 * @since JSky 1.0.0
+	 */
 	@NotNull
 	public JLogger setDebugLevel() {
 		return setLevel(Level.DEBUG);
@@ -130,6 +172,14 @@ public class JLogger implements System.Logger {
 	 - Info
 	 */
 
+	/**
+	 * Shortcut to {@link #setLevel(Level) set the level}
+	 * of this {@link JLogger} to {@link Level#INFO INFO}.
+	 *
+	 * @return This {@link JLogger}
+	 *
+	 * @since JSky 1.0.0
+	 */
 	@NotNull
 	public JLogger setInfoLevel() {
 		return setLevel(Level.INFO);
@@ -143,6 +193,14 @@ public class JLogger implements System.Logger {
 	 - Warning
 	 */
 
+	/**
+	 * Shortcut to {@link #setLevel(Level) set the level}
+	 * of this {@link JLogger} to {@link Level#WARNING WARNING}.
+	 *
+	 * @return This {@link JLogger}
+	 *
+	 * @since JSky 1.0.0
+	 */
 	@NotNull
 	public JLogger setWarningLevel() {
 		return setLevel(Level.WARNING);
@@ -156,6 +214,14 @@ public class JLogger implements System.Logger {
 	 - Error
 	 */
 
+	/**
+	 * Shortcut to {@link #setLevel(Level) set the level}
+	 * of this {@link JLogger} to {@link Level#ERROR ERROR}.
+	 *
+	 * @return This {@link JLogger}
+	 *
+	 * @since JSky 1.0.0
+	 */
 	@NotNull
 	public JLogger setErrorLevel() {
 		return setLevel(Level.ERROR);
