@@ -57,6 +57,21 @@ public class JLogger implements System.Logger {
 	 */
 
 	/**
+	 * Gets the current logging {@link Level level} of this
+	 * {@link JLogger}. Messages sent to this logger that have
+	 * a lower {@link Level#getSeverity() severity} than the
+	 * severity of this {@link Level level} will be discarded.
+	 *
+	 * @return The current logging {@link Level level} of this {@link JLogger}.
+	 *
+	 * @since JSky 1.0.0
+	 */
+	@NotNull
+	public Level getLevel() {
+		return fromJUL(logger.getLevel());
+	}
+
+	/**
 	 * Sets the logging {@link Level level} of this {@link JLogger}
 	 * to the provided {@code level}. Messages with a lower
 	 * {@link Level#getSeverity() severity} will be discarded.
@@ -92,6 +107,30 @@ public class JLogger implements System.Logger {
 	@Override
 	public boolean isLoggable(@NotNull final Level level) {
 		return logger.isLoggable(toJUL(level));
+	}
+
+	/*
+	 - Level conversion utility
+	 */
+
+	@NotNull
+	private Level fromJUL(@NotNull final java.util.logging.Level level) {
+		final int value = level.intValue();
+		if (value == java.util.logging.Level.ALL.intValue())
+			return Level.ALL;
+		if (value == java.util.logging.Level.FINEST.intValue())
+			return Level.TRACE;
+		if (value == java.util.logging.Level.FINE.intValue())
+			return Level.DEBUG;
+		if (value == java.util.logging.Level.INFO.intValue())
+			return Level.INFO;
+		if (value == java.util.logging.Level.WARNING.intValue())
+			return Level.WARNING;
+		if (value == java.util.logging.Level.SEVERE.intValue())
+			return Level.ERROR;
+		if (value == java.util.logging.Level.OFF.intValue())
+			return Level.OFF;
+		throw new IllegalArgumentException("Unknown level: " + level);
 	}
 
 	private java.util.logging.Level toJUL(@NotNull final Level level) {
