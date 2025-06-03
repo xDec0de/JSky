@@ -290,7 +290,7 @@ public class JCollections {
 
 	@NotNull
 	public static <E> List<E> clone(@NotNull List<E> list, @NotNull Predicate<E> filter) {
-		return add(list, clone(list), filter);
+		return add(list, new ArrayList<>(), filter);
 	}
 
 	/*
@@ -310,7 +310,7 @@ public class JCollections {
 
 	@NotNull
 	public static <E> ArrayList<E> clone(@NotNull ArrayList<E> list, @NotNull Predicate<E> filter) {
-		return add(list, clone(list), filter);
+		return add(list, new ArrayList<>(), filter);
 	}
 
 	/*
@@ -330,7 +330,7 @@ public class JCollections {
 
 	@NotNull
 	public static <E> LinkedList<E> clone(@NotNull LinkedList<E> list, @NotNull Predicate<E> filter) {
-		return add(list, clone(list), filter);
+		return add(list, new LinkedList<>(), filter);
 	}
 
 	/*
@@ -350,7 +350,7 @@ public class JCollections {
 
 	@NotNull
 	public static <E> Set<E> clone(@NotNull Set<E> set, @NotNull Predicate<E> filter) {
-		return add(set, clone(set), filter);
+		return add(set, new HashSet<>(), filter);
 	}
 
 	/*
@@ -370,7 +370,7 @@ public class JCollections {
 
 	@NotNull
 	public static <E> HashSet<E> clone(@NotNull HashSet<E> set, @NotNull Predicate<E> filter) {
-		return add(set, clone(set), filter);
+		return add(set, new HashSet<>(), filter);
 	}
 
 	/*
@@ -390,7 +390,7 @@ public class JCollections {
 
 	@NotNull
 	public static <E> LinkedHashSet<E> clone(@NotNull LinkedHashSet<E> set, @NotNull Predicate<E> filter) {
-		return add(set, clone(set), filter);
+		return add(set, new LinkedHashSet<>(), filter);
 	}
 
 	/*
@@ -410,7 +410,7 @@ public class JCollections {
 
 	@NotNull
 	public static <E extends Comparable<C>, C> TreeSet<E> clone(@NotNull TreeSet<E> set, @NotNull Predicate<E> filter) {
-		return add(set, clone(set), filter);
+		return add(set, new TreeSet<>(), filter);
 	}
 
 	/*
