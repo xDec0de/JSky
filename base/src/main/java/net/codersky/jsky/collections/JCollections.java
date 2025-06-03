@@ -56,15 +56,16 @@ import java.util.function.Predicate;
 public class JCollections {
 
 	private JCollections() {
-		// Protect default constructor.
+		throw new UnsupportedOperationException("Can't instantiate JCollections.");
 	}
 
 	/*
 	 - List creation - ArrayList
 	 */
 
+	@NotNull
 	public static <E> ArrayList<E> asArrayList(@NotNull E element) {
-		final ArrayList<E> list = new ArrayList<>();
+		final ArrayList<E> list = new ArrayList<>(1);
 		list.add(element);
 		return list;
 	}
@@ -106,14 +107,6 @@ public class JCollections {
 	 */
 
 	@NotNull
-	public static List<Character> asCharList(char... chars) {
-		final ArrayList<Character> list = new ArrayList<>(chars.length);
-		for (char c : chars)
-			list.add(c);
-		return list;
-	}
-
-	@NotNull
 	public static List<Boolean> asBooleanList(boolean... booleans) {
 		final ArrayList<Boolean> list = new ArrayList<>(booleans.length);
 		for (boolean b : booleans)
@@ -122,34 +115,18 @@ public class JCollections {
 	}
 
 	@NotNull
-	public static List<Double> asDoubleList(double... doubles) {
-		final ArrayList<Double> list = new ArrayList<>(doubles.length);
-		for (double d : doubles)
-			list.add(d);
+	public static List<Character> asCharList(char... chars) {
+		final ArrayList<Character> list = new ArrayList<>(chars.length);
+		for (char c : chars)
+			list.add(c);
 		return list;
 	}
 
 	@NotNull
-	public static List<Float> asFloatList(float... floats) {
-		final ArrayList<Float> list = new ArrayList<>(floats.length);
-		for (float f : floats)
-			list.add(f);
-		return list;
-	}
-
-	@NotNull
-	public static List<Long> asLongList(long... longs) {
-		final ArrayList<Long> list = new ArrayList<>(longs.length);
-		for (long l : longs)
-			list.add(l);
-		return list;
-	}
-
-	@NotNull
-	public static List<Integer> asIntList(int... ints) {
-		final ArrayList<Integer> list = new ArrayList<>(ints.length);
-		for (int i : ints)
-			list.add(i);
+	public static List<Byte> asByteList(byte... bytes) {
+		final ArrayList<Byte> list = new ArrayList<>(bytes.length);
+		for (byte b : bytes)
+			list.add(b);
 		return list;
 	}
 
@@ -162,10 +139,34 @@ public class JCollections {
 	}
 
 	@NotNull
-	public static List<Byte> asByteList(byte... bytes) {
-		final ArrayList<Byte> list = new ArrayList<>(bytes.length);
-		for (byte b : bytes)
-			list.add(b);
+	public static List<Integer> asIntList(int... ints) {
+		final ArrayList<Integer> list = new ArrayList<>(ints.length);
+		for (int i : ints)
+			list.add(i);
+		return list;
+	}
+
+	@NotNull
+	public static List<Long> asLongList(long... longs) {
+		final ArrayList<Long> list = new ArrayList<>(longs.length);
+		for (long l : longs)
+			list.add(l);
+		return list;
+	}
+
+	@NotNull
+	public static List<Float> asFloatList(float... floats) {
+		final ArrayList<Float> list = new ArrayList<>(floats.length);
+		for (float f : floats)
+			list.add(f);
+		return list;
+	}
+
+	@NotNull
+	public static List<Double> asDoubleList(double... doubles) {
+		final ArrayList<Double> list = new ArrayList<>(doubles.length);
+		for (double d : doubles)
+			list.add(d);
 		return list;
 	}
 
@@ -472,6 +473,7 @@ public class JCollections {
 	 */
 
 	@NotNull
+	@SafeVarargs
 	public static <C extends Collection<E>, E> C addAll(@NotNull C collection, @NotNull Collection<E>... others) {
 		for (Collection<E> other : others)
 			collection.addAll(other);
@@ -479,6 +481,7 @@ public class JCollections {
 	}
 
 	@NotNull
+	@SafeVarargs
 	public static <C extends Collection<E>, E> C addAll(@NotNull C collection, @NotNull Predicate<E> condition, @NotNull Collection<E>... others) {
 		for (Collection<E> other : others)
 			for (E element : other)
