@@ -10,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -410,6 +411,28 @@ public class JCollections {
 	@NotNull
 	public static <E extends Comparable<C>, C> TreeSet<E> clone(@NotNull TreeSet<E> set, @NotNull Predicate<E> filter) {
 		return add(set, clone(set), filter);
+	}
+
+	/*
+	 - Cloning - EnumSet
+	 */
+
+	@NotNull
+	public static <E extends Enum<E>> EnumSet<E> clone(@NotNull EnumSet<E> set) {
+		return EnumSet.copyOf(set);
+	}
+
+	@NotNull
+	@SafeVarargs
+	public static <E extends Enum<E>> EnumSet<E> clone(@NotNull EnumSet<E> set, @NotNull Consumer<EnumSet<E>>... edits) {
+		return edit(clone(set), edits);
+	}
+
+	@NotNull
+	@SuppressWarnings("unchecked")
+	public static <E extends Enum<E>> EnumSet<E> clone(@NotNull EnumSet<E> set, @NotNull Predicate<E> filter) {
+		final E first = set.stream().findFirst().orElse(null);
+		return first == null ? clone(set) : add(set, asEnumSet(first.getClass()), filter);
 	}
 
 	/*
