@@ -523,6 +523,50 @@ public class JCollections {
 	}
 
 	/*
+	 - Join - Lists
+	 */
+
+	@NotNull
+	@SafeVarargs
+	public static <E> ArrayList<E> join(@NotNull ArrayList<E> list, @NotNull Collection<E>... others) {
+		return addAll(clone(list), others);
+	}
+
+	@NotNull
+	@SafeVarargs
+	public static <E> LinkedList<E> join(@NotNull LinkedList<E> list, @NotNull Collection<E>... others) {
+		return addAll(clone(list), others);
+	}
+
+	/*
+	 - Join - Sets
+	 */
+
+	@NotNull
+	@SafeVarargs
+	public static <E> HashSet<E> join(@NotNull HashSet<E> set, @NotNull Collection<E>... others) {
+		return addAll(clone(set), others);
+	}
+
+	@NotNull
+	@SafeVarargs
+	public static <E> LinkedHashSet<E> join(@NotNull LinkedHashSet<E> set, @NotNull Collection<E>... others) {
+		return addAll(clone(set), others);
+	}
+
+	@NotNull
+	@SafeVarargs
+	public static <E extends Comparable<C>, C> TreeSet<E> join(@NotNull TreeSet<E> set, @NotNull Collection<E>... others) {
+		return addAll(clone(set), others);
+	}
+
+	@NotNull
+	@SafeVarargs
+	public static <E extends Enum<E>> EnumSet<E> join(@NotNull EnumSet<E> set, @NotNull Collection<E>... others) {
+		return addAll(clone(set), others);
+	}
+
+	/*
 	 - Removal
 	 */
 
