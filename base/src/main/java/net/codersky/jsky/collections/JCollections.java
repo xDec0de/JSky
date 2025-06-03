@@ -10,7 +10,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -414,7 +413,7 @@ public class JCollections {
 	}
 
 	/*
-	 - Addition
+	 - Addition - add
 	 */
 
 	@NotNull
@@ -446,7 +445,27 @@ public class JCollections {
 	}
 
 	/*
-	 - Join
+	 - Addition - addAll
+	 */
+
+	@NotNull
+	public static <C extends Collection<E>, E> C addAll(@NotNull C collection, @NotNull Collection<E>... others) {
+		for (Collection<E> other : others)
+			collection.addAll(other);
+		return collection;
+	}
+
+	@NotNull
+	public static <C extends Collection<E>, E> C addAll(@NotNull C collection, @NotNull Predicate<E> condition, @NotNull Collection<E>... others) {
+		for (Collection<E> other : others)
+			for (E element : other)
+				if (condition.test(element))
+					collection.add(element);
+		return collection;
+	}
+
+	/*
+	 - Join - Generic
 	 */
 
 	/**
@@ -477,12 +496,7 @@ public class JCollections {
 	@SafeVarargs
 	public static <C extends Collection<E>, E> C join(@NotNull C collection, @NotNull Collection<E>... others) {
 		final C joined = of(collection);
-		if (joined == null)
-			return null;
-		joined.addAll(collection);
-		for (Collection<E> other : others)
-			joined.addAll(other);
-		return joined;
+		return joined == null ? null : addAll(add(joined, collection), others);
 	}
 
 	/*
