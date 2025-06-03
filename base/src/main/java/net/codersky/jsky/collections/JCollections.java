@@ -746,6 +746,17 @@ public class JCollections {
 	}
 
 	/*
+	 - Size of
+	 */
+
+	public static int sizeOf(@NotNull Collection<?>... collections) {
+		int size = 0;
+		for (Collection<?> collection : collections)
+			size += collection.size();
+		return size;
+	}
+
+	/*
 	 - Internal utility
 	 */
 
