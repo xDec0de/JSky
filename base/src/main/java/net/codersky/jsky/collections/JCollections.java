@@ -8,6 +8,9 @@ import net.codersky.jsky.predicate.ShortPredicate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -443,6 +446,46 @@ public class JCollections {
 	}
 
 	/*
+	 - Join
+	 */
+
+	/**
+	 * Creates a new {@link Collection} of the same type as the first
+	 * {@code collection}, containing all elements from the given
+	 * {@code collection} and all additional collections ({@code others}).
+	 * All elements from {@code collection} and each {@code others} collection
+	 * are added in order to the new collection.
+	 * <p>
+	 * This method uses reflection to instantiate a new empty collection
+	 * of the same type as {@code collection}.
+	 *
+	 * @param collection The base collection from which to derive the new
+	 * collection type and whose elements are included.
+	 * @param others Additional collections whose elements will be joined.
+	 *
+	 * @param <C> The type of the first {@code collection}.
+	 * @param <E> The type of elements contained in all collections.
+	 *
+	 * @return A new {@link Collection} of the same type as {@code collection}, containing
+	 * all elements from {@code collection} and {@code others}. {@code null} if instantiation fails
+	 *
+	 * @throws NullPointerException if {@code collection} or any of {@code others} is {@code null}
+	 *
+	 * @since JSky 1.0.0
+	 */
+	@Nullable
+	@SafeVarargs
+	public static <C extends Collection<E>, E> C join(@NotNull C collection, @NotNull Collection<E>... others) {
+		final C joined = of(collection);
+		if (joined == null)
+			return null;
+		joined.addAll(collection);
+		for (Collection<E> other : others)
+			joined.addAll(other);
+		return joined;
+	}
+
+	/*
 	 - Removal
 	 */
 
@@ -686,5 +729,30 @@ public class JCollections {
 	@NotNull
 	public static <E> List<E> getRandom(@NotNull Collection<E> collection, int amount) {
 		return getRandom(collection, amount, false);
+	}
+
+	/*
+	 - Internal utility
+	 */
+
+	@SuppressWarnings("unchecked")
+	private static <C extends Collection<E>, E> Constructor<C> getConstructor(C from) {
+		final Constructor<?>[] constructors = from.getClass().getDeclaredConstructors();
+		for (final Constructor<?> c : constructors)
+			if (c.getParameterTypes().length == 0 && c.getModifiers() == Modifier.PUBLIC)
+				return (Constructor<C>) c;
+		return null;
+	}
+
+	@Nullable
+	private static <C extends Collection<E>, E> C of(@NotNull C from) {
+		final Constructor<C> constructor = getConstructor(from);
+		if (constructor == null)
+			return null;
+		try {
+			return constructor.newInstance();
+		} catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+			return null;
+		}
 	}
 }
