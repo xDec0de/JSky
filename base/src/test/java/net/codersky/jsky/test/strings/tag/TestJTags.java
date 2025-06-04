@@ -137,6 +137,25 @@ public class TestJTags {
 	}
 
 	/*
+	 - Raw
+	 */
+
+	@Test
+	public void testGetRaw() {
+		final JTag a = new JTag("a");
+		final JTag ab = new JTag("a", "b");
+		assertEquals("<a>", a.getRaw());
+		assertEquals("<a:b>", ab.getRaw());
+		final JTag child = new JTag("ab", "cd", new JTag[] {ab});
+		assertEquals("<ab:cd<a:b>>", child.getRaw());
+		assertEquals("<a:b>", child.getChildren()[0].getRaw());
+		final String parse = "<a:b<c:d>e>";
+		assertEquals(parse, parse(parse).getTag().getRaw());
+		final String parseNest = "<a:a<bb:bb<ccc:ccc>bb>a>";
+		assertEquals(parseNest, parse(parseNest).getTag().getRaw());
+	}
+
+	/*
 	 - Util
 	 */
 

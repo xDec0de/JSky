@@ -8,22 +8,35 @@ import java.util.Objects;
 
 public class JTag {
 
+	private final String raw;
 	private final String name;
 	private final String content;
 	private final JTag[] children;
 
-	public JTag(@NotNull String name, @NotNull String content, @NotNull JTag @NotNull [] children) {
+	JTag(@NotNull String raw, @NotNull String name, @NotNull String content, @NotNull JTag @NotNull [] children) {
+		this.raw = "<" + Objects.requireNonNull(raw) + ">";
 		this.name = Objects.requireNonNull(name);
 		this.content = Objects.requireNonNull(content);
 		this.children = Objects.requireNonNull(children);
 	}
 
+	public JTag(@NotNull String name, @NotNull String content, @NotNull JTag @NotNull [] children) {
+		this(rawWithChildren(name, content, children), name, content, children);
+	}
+
+	private static String rawWithChildren(String name, String content, JTag[] children) {
+		final StringBuilder result = new StringBuilder(name).append(":").append(content);
+		for (JTag child : children)
+			result.append(child.getRaw());
+		return result.toString();
+	}
+
 	public JTag(@NotNull String name, @NotNull String content) {
-		this(name, content, JTagParser.EMPTY_TAG_ARRAY);
+		this(name + ":" + content,  name, content, JTagParser.EMPTY_TAG_ARRAY);
 	}
 
 	public JTag(@NotNull String name) {
-		this(name, "");
+		this(name, name, "", JTagParser.EMPTY_TAG_ARRAY);
 	}
 
 	@NotNull
@@ -41,6 +54,19 @@ public class JTag {
 		return children;
 	}
 
+	/*
+	 - Raw
+	 */
+
+	@NotNull
+	public String getRaw() {
+		return this.raw;
+	}
+
+	/*
+	 - Equals
+	 */
+
 	@Override
 	public boolean equals(@Nullable Object obj) {
 		if (obj == this)
@@ -54,6 +80,10 @@ public class JTag {
 		}
 		return false;
 	}
+
+	/*
+	 - toString
+	 */
 
 	@Override
 	public String toString() {
