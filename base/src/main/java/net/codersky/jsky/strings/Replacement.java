@@ -4,7 +4,7 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * An interface used to indicate that an {@link Object} can be directly
- * used by a {@link strings.Replacer} with the {@link #asReplacement()} method.
+ * used by a {@link Replacer} with the {@link #asReplacement()} method.
  * 
  * @since JSky 1.0.0
  *
