@@ -31,7 +31,7 @@ import java.util.Objects;
  */
 public class Replacer implements Cloneable {
 
-	private final HashMap<String, Object> map = new HashMap<>();
+	final HashMap<String, Object> replacementsMap = new HashMap<>();
 
 	/**
 	 * Creates a new {@link Replacer} with the specified {@code replacements}.
@@ -88,7 +88,7 @@ public class Replacer implements Cloneable {
 		for (int i = 0; i <= replacements.length - 1; i += 2) {
 			final Object key = replacements[i];
 			final Object value = replacements[i + 1];
-			map.put(key == null ? "null" : key.toString(), value == null ? "null" : value);
+			replacementsMap.put(key == null ? "null" : key.toString(), value == null ? "null" : value);
 		}
 		return this;
 	}
@@ -108,7 +108,7 @@ public class Replacer implements Cloneable {
 	@NotNull
 	public Replacer add(@NotNull Replacer... replacers) {
 		for (final Replacer replacer : replacers)
-			this.map.putAll(replacer.map);
+			this.replacementsMap.putAll(replacer.replacementsMap);
 		return this;
 	}
 
@@ -148,11 +148,11 @@ public class Replacer implements Cloneable {
 	 */
 	@NotNull
 	public String replaceAt(@NotNull String str) {
-		final int mapSize = map.size();
+		final int mapSize = replacementsMap.size();
 		if (mapSize == 0 || str.isEmpty())
 			return str;
 		final StringBuilder res = new StringBuilder(str);
-		for (Map.Entry<String, Object> entry : map.entrySet()) {
+		for (Map.Entry<String, Object> entry : replacementsMap.entrySet()) {
 			final String toSearch = entry.getKey();
 			final String replacement = getStringValue(entry.getValue());
 			final int replacementLen = replacement.length();
@@ -228,7 +228,7 @@ public class Replacer implements Cloneable {
 	 */
 	@NotNull
 	public Map<String, Object> getReplacementMap() {
-		return new HashMap<>(map);
+		return new HashMap<>(replacementsMap);
 	}
 
 	/*
@@ -238,13 +238,13 @@ public class Replacer implements Cloneable {
 	@Override
 	public boolean equals(final Object obj) {
 		if (obj instanceof final Replacer other)
-			return this == other || this.map.equals(other.map);
+			return this == other || this.replacementsMap.equals(other.replacementsMap);
 		return false;
 	}
 
 	@NotNull
 	@Override
 	public String toString() {
-		return "Replacer" + map;
+		return "Replacer" + replacementsMap;
 	}
 }
