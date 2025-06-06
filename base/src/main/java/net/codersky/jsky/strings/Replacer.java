@@ -157,7 +157,7 @@ public class Replacer implements Cloneable {
 		final StringBuilder res = new StringBuilder(str);
 		for (Map.Entry<String, Object> entry : replacementsMap.entrySet()) {
 			final String toSearch = entry.getKey();
-			final String replacement = getStringValue(entry.getValue());
+			final String replacement = Replacement.toStringValue(entry.getValue());
 			final int replacementLen = replacement.length();
 			final int searchLen = toSearch.length();
 			int index = res.indexOf(toSearch);
@@ -167,12 +167,6 @@ public class Replacer implements Cloneable {
 			}
 		}
 		return res.toString();
-	}
-
-	private @NotNull String getStringValue(final Object replacement) {
-		if (replacement instanceof final Replacement rep)
-			return rep.asReplacement();
-		return replacement.toString();
 	}
 
 	/*
