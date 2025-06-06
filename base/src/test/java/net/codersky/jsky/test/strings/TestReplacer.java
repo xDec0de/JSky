@@ -20,14 +20,14 @@ public class TestReplacer {
 	public void testReplace() {
 
 		// Basic replacer
-		final Replacer world = new Replacer("%w", "world", null);
+		final Replacer world = new Replacer("%w", "world");
 		assertEquals("Hello world", world.replaceAt("Hello %w"));
 
 		// Replacement interface
 		final ExampleReplacement replacement = new ExampleReplacement();
 
-		final Replacer withrep = new Replacer("%r", replacement);
-		world.add(withrep);
+		final Replacer withRep = new Replacer("%r", replacement);
+		world.add(withRep);
 		assertEquals("world, replacement", world.replaceAt("%w, %r"));
 
 		// Value change in replacement
@@ -40,6 +40,13 @@ public class TestReplacer {
 		final Replacer original = new Replacer("hi", "bye", "code", 42);
 		final Replacer clone = original.clone();
 		assertEquals(clone, original);
+	}
+
+	@Test
+	public void testOverwrite() {
+		final Replacer helloWorld = new Replacer("%hw", "world");
+		helloWorld.add("%hw", "hello world");
+		assertEquals("hello world", helloWorld.replaceAt("%hw"));
 	}
 
 	private static class ExampleReplacement implements Replacement {

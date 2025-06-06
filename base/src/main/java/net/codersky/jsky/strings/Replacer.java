@@ -4,8 +4,9 @@ import net.codersky.jsky.collections.JCollections;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -13,14 +14,14 @@ import java.util.Objects;
  * This class is designed to make text replacement easy, providing
  * the ability to apply the same replacements on multiple Strings.
  * <p>
- * Also, check the {@link Replacement} {@code interface}.
- * {@link Replacement#asReplacement()} is used instead of
- * {@link Object#toString()} for replacements that implement it.
- * <p>
  * The most useful feature about the Replacer {@code class} is
  * that it preserves the instance of objects used as replacements,
  * meaning that if the state of a replacement object changes, the
  * change will be shown the next time the Replacer is applied.
+ * <p>
+ * Also, check the {@link Replacement} {@code interface}.
+ * {@link Replacement#asReplacement()} is used instead of
+ * {@link Object#toString()} for replacements that implement it.
  *
  * @since JSky 1.0.0
  * 
@@ -30,19 +31,18 @@ import java.util.Objects;
  */
 public class Replacer implements Cloneable {
 
-	private final ArrayList<Object> replaceList = new ArrayList<>();
+	private final HashMap<String, Object> map = new HashMap<>();
 
 	/**
-	 * Creates a replacer to replace parts of a string with other strings,
-	 * if you want to use the same replacements for multiple strings, you should 
-	 * create a {@link Replacer} variable and apply it to as many strings as you
-	 * want to <b>avoid creating multiple instances of the same replacements</b>,
-	 * also,  make sure that the amount of strings added to the {@link Replacer}
-	 * are <b>even</b>, otherwise, an {@link IllegalArgumentException} will be thrown.
+	 * Creates a new {@link Replacer} with the specified {@code replacements}.
+	 * Keep in mind that the size of the {@code replacements} <b>must be even</b>.
 	 *
-	 * @param replacements The replacements to add. The format is <i>"str1", "obj1", "str2", "obj2"...</i>,
-	 * so for example <i>"%test%", 1</i> would replace every occurrence of "%test%" with 1.
-	 * {@code null} values will be added as the string literal <i>"null"</i>.
+	 * @param replacements The replacements to use. This parameter will be translated
+	 * to a {@link HashMap map}, so the format goes as: [key1, value1, key2, value2...].
+	 * The keys are the text to replace, while the values are the replacements. So for
+	 * example ["%n", 42], would replace "%n" with "42". Keep in mind that as
+	 * a {@link HashMap map} is used internally, new replacements for the same key will
+	 * overwrite its value. {@code null} values will be added as the string literal <i>"null"</i>.
 	 *
 	 * @throws IllegalArgumentException If the amount of {@code replacements} is not even,
 	 * more technically, if {@code replacements} size % 2 is not equal to 0.
@@ -59,19 +59,17 @@ public class Replacer implements Cloneable {
 	}
 
 	/**
-	 * Adds new {@code replacements} to an existing {@link Replacer}. The amount of replacements must also be even.
-	 * Note that existing replacements will be added to the list but the new replacer won't overwrite them.
-	 * Because of the way {@link Replacer Replacers} work, only the first replacement added for a string will take
-	 * effect if there is another replacement added to said string later on.
-	 * <p>
-	 * Example: text is <i>"Replace %test%"</i>, we add <i>"%test%", "Hello"</i> and <i>"%test%", "World"</i>. The
-	 * result will be <i>"Replace Hello"</i>, as only the first replacement over <i>%test%</i> will take effect.
+	 * Adds new {@code replacements} to an existing {@link Replacer}.
+	 * The amount of replacements must also be even.
+	 *
+	 * @param replacements The replacements to use. This parameter will be translated
+	 * to a {@link HashMap map}, so the format goes as: [key1, value1, key2, value2...].
+	 * The keys are the text to replace, while the values are the replacements. So for
+	 * example ["%n", 42], would replace "%n" with "42". Keep in mind that as
+	 * a {@link HashMap map} is used internally, new replacements for the same key will
+	 * overwrite its value. {@code null} values will be added as the string literal <i>"null"</i>.
 	 * 
-	 * @param replacements The replacements to add. The format is <i>"str1", "obj1", "str2", "obj2"...</i>,
-	 * so for example <i>"%test%", 1</i> would replace every occurrence of "%test%" with 1.
-	 * {@code null} values will be added as the string literal <i>"null"</i>.
-	 * 
-	 * @return This {@link Replacer} with the new <b>replacements</b> added to it.
+	 * @return This {@link Replacer} with the new {@code replacements} added to it.
 	 *
 	 * @throws IllegalArgumentException If the amount of {@code replacements} is not even,
 	 * more technically, if {@code replacements} size % 2 is not equal to 0.
@@ -87,20 +85,17 @@ public class Replacer implements Cloneable {
 		Objects.requireNonNull(replacements, "Replacements cannot be null");
 		if (replacements.length % 2 != 0)
 			throw new IllegalArgumentException("Invalid Replacer size: " + replacements.length);
-		for (final Object replacement : replacements)
-			replaceList.add(replacement == null ? "null" : replacement);
+		for (int i = 0; i <= replacements.length - 1; i += 2) {
+			final Object key = replacements[i];
+			final Object value = replacements[i + 1];
+			map.put(key == null ? "null" : key.toString(), value == null ? "null" : value);
+		}
 		return this;
 	}
 
 	/**
 	 * Adds the replacements of the specified {@code replacers} to this {@link Replacer}, joining them.
-	 * Note that existing replacements will be added to the list but the new {@link Replacer} won't overwrite them.
-	 * Because of the way {@link Replacer Replacers} work, only the first replacement added for a string will take
-	 * effect if there is another replacement added to said string later on.
-	 * <p>
-	 * Example: text is <i>"Replace %test%"</i>, we add <i>"%test%", "Hello"</i> and <i>"%test%", "World"</i>. The
-	 * result will be <i>"Replace Hello"</i>, as only the first replacement over <i>%test%</i> will take effect.
-	 * 
+	 *
 	 * @param replacers The {@link Replacer Replacers} to join to the existing {@link Replacer}.
 	 * 
 	 * @return The old {@link Replacer} with the replacements of {@code replacer} added to it.
@@ -112,8 +107,8 @@ public class Replacer implements Cloneable {
 	 */
 	@NotNull
 	public Replacer add(@NotNull Replacer... replacers) {
-		for (Replacer replacer : replacers)
-			replaceList.addAll(replacer.replaceList);
+		for (final Replacer replacer : replacers)
+			this.map.putAll(replacer.map);
 		return this;
 	}
 
@@ -142,7 +137,7 @@ public class Replacer implements Cloneable {
 	 * 
 	 * @param str The {@link String} to apply the replacements to.
 	 * 
-	 * @return A new {@link String} with all {@link #getReplacements() replacements} applied to it.
+	 * @return A new {@link String} with all {@link #getReplacementMap() replacements} applied to it.
 	 *
 	 * @throws NullPointerException if {@code str} is {@code null}.
 	 *
@@ -153,15 +148,15 @@ public class Replacer implements Cloneable {
 	 */
 	@NotNull
 	public String replaceAt(@NotNull String str) {
-		final int repLstLen = replaceList.size();
-		if (repLstLen == 0 || str.isEmpty())
+		final int mapSize = map.size();
+		if (mapSize == 0 || str.isEmpty())
 			return str;
 		final StringBuilder res = new StringBuilder(str);
-		for (int i = 0; i <= repLstLen - 1; i += 2) {
-			final String toSearch = replaceList.get(i).toString();
-			final int searchLen = toSearch.length();
-			final String replacement = getStringValueAt(i + 1);
+		for (Map.Entry<String, Object> entry : map.entrySet()) {
+			final String toSearch = entry.getKey();
+			final String replacement = getStringValue(entry.getValue());
 			final int replacementLen = replacement.length();
+			final int searchLen = toSearch.length();
 			int index = res.indexOf(toSearch);
 			while (index != -1) {
 				res.replace(index, index + searchLen, replacement);
@@ -171,8 +166,7 @@ public class Replacer implements Cloneable {
 		return res.toString();
 	}
 
-	private @NotNull String getStringValueAt(final int index) {
-		final Object replacement = replaceList.get(index);
+	private @NotNull String getStringValue(final Object replacement) {
 		if (replacement instanceof final Replacement rep)
 			return rep.asReplacement();
 		return replacement.toString();
@@ -233,8 +227,8 @@ public class Replacer implements Cloneable {
 	 * @since JSky 1.0.0
 	 */
 	@NotNull
-	public List<Object> getReplacements() {
-		return new ArrayList<>(replaceList);
+	public Map<String, Object> getReplacementMap() {
+		return new HashMap<>(map);
 	}
 
 	/*
@@ -244,13 +238,13 @@ public class Replacer implements Cloneable {
 	@Override
 	public boolean equals(final Object obj) {
 		if (obj instanceof final Replacer other)
-			return this == other || replaceList.equals(other.replaceList);
+			return this == other || this.map.equals(other.map);
 		return false;
 	}
 
 	@NotNull
 	@Override
 	public String toString() {
-		return "Replacer" + replaceList.toString();
+		return "Replacer" + map;
 	}
 }
