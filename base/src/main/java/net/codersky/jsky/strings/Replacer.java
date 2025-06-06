@@ -2,37 +2,33 @@ package net.codersky.jsky.strings;
 
 import net.codersky.jsky.collections.JCollections;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.awt.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 /**
- * Represents a replacer to replace parts of a {@link String} or {@link Component} with other objects.
- * If you want to use the same replacements for multiple objects, you should create a replacer variable and
- * apply it to as many objects as you want to <b>avoid creating multiple instances of the same replacements</b>,
- * also, make sure that the amount of objects added to the replacer are <b>even</b>,
- * otherwise, an {@link IllegalArgumentException} will be thrown.
+ * Class used to replace parts of a {@link String} with other objects.
+ * This class is designed to make text replacement easy, providing
+ * the ability to apply the same replacements on multiple Strings.
  * <p>
- * <b>Numeric support:</b>
+ * Also, check the {@link Replacement} {@code interface}.
+ * {@link Replacement#asReplacement()} is used instead of
+ * {@link Object#toString()} for replacements that implement it.
  * <p>
- * This feature is always enabled with Replacers and adds the possibility to apply different replacements
- * depending on numeric values, don't worry about performance, the impact isn't noticeable unless you are
- * parsing millions of strings as this doesn't use regular expressions. Here is a common example on how to use it:
- * <p>
- * <code>new Replacer("%points%", 10).replaceAt("You have %points% <%points%:point:points>"</code>
- * <p>
- * With this example, the returning string will be "<b>You have 10 points</b>".
- * If instead of 10 we had 1 (or -1) point, the result would be "<b>You have 1 point</b>",
- * 
+ * The most useful feature about the Replacer {@code class} is
+ * that it preserves the instance of objects used as replacements,
+ * meaning that if the state of a replacement object changes, the
+ * change will be shown the next time the Replacer is applied.
+ *
  * @since JSky 1.0.0
  * 
  * @see #Replacer(Object...)
  *
  * @author xDec0de_
  */
-public class Replacer {
+public class Replacer implements Cloneable {
 
 	private final ArrayList<Object> replaceList = new ArrayList<>();
 
@@ -43,13 +39,14 @@ public class Replacer {
 	 * want to <b>avoid creating multiple instances of the same replacements</b>,
 	 * also,  make sure that the amount of strings added to the {@link Replacer}
 	 * are <b>even</b>, otherwise, an {@link IllegalArgumentException} will be thrown.
-	 * 
-	 * @param replacements The strings to be replaced, the format is <i>"str1", "obj1", "str2", "obj2"...</i>,
-	 * so for example <i>"%test%", 1</i> would replace every occurrence of "%test%" with 1.
 	 *
-	 * @throws IllegalArgumentException if the amount of {@code replacements} is not even,
+	 * @param replacements The replacements to add. The format is <i>"str1", "obj1", "str2", "obj2"...</i>,
+	 * so for example <i>"%test%", 1</i> would replace every occurrence of "%test%" with 1.
+	 * {@code null} values will be added as the string literal <i>"null"</i>.
+	 *
+	 * @throws IllegalArgumentException If the amount of {@code replacements} is not even,
 	 * more technically, if {@code replacements} size % 2 is not equal to 0.
-	 * @throws NullPointerException if {@code replacements} or any individual replacement is {@code null}.
+	 * @throws NullPointerException If {@code replacements} itself is {@code null}.
 	 * 
 	 * @since JSky 1.0.0
 	 * 
@@ -57,43 +54,41 @@ public class Replacer {
 	 * @see #add(Object...)
 	 * @see #replaceAt(String)
 	 */
-	public Replacer(@NotNull Object... replacements) {
+	public Replacer(@Nullable Object... replacements) {
 		add(replacements);
 	}
 
 	/**
-	 * Adds new {@code replacements} to an existing {@link Replacer}. the amount of replacements must also be even
-	 * note that existing replacements will be added to the list but the new replacer won't overwrite them.
+	 * Adds new {@code replacements} to an existing {@link Replacer}. The amount of replacements must also be even.
+	 * Note that existing replacements will be added to the list but the new replacer won't overwrite them.
 	 * Because of the way {@link Replacer Replacers} work, only the first replacement added for a string will take
 	 * effect if there is another replacement added to said string later on.
 	 * <p>
 	 * Example: text is <i>"Replace %test%"</i>, we add <i>"%test%", "Hello"</i> and <i>"%test%", "World"</i>. The
 	 * result will be <i>"Replace Hello"</i>, as only the first replacement over <i>%test%</i> will take effect.
 	 * 
-	 * @param replacements The replacements to add. The format is <i>"str1", "obj1", "str2", "obj2"...</i>
+	 * @param replacements The replacements to add. The format is <i>"str1", "obj1", "str2", "obj2"...</i>,
+	 * so for example <i>"%test%", 1</i> would replace every occurrence of "%test%" with 1.
+	 * {@code null} values will be added as the string literal <i>"null"</i>.
 	 * 
 	 * @return This {@link Replacer} with the new <b>replacements</b> added to it.
 	 *
-	 * @throws IllegalArgumentException if the amount of {@code replacements} is not even,
+	 * @throws IllegalArgumentException If the amount of {@code replacements} is not even,
 	 * more technically, if {@code replacements} size % 2 is not equal to 0.
-	 * @throws NullPointerException if {@code replacements} or any individual replacement is {@code null}.
-	 * 
+	 * @throws NullPointerException If {@code replacements} itself is {@code null}.
+	 *
 	 * @since JSky 1.0.0
 	 * 
 	 * @see #add(Replacer...)
 	 * @see #replaceAt(String)
 	 */
 	@NotNull
-	public Replacer add(@NotNull Object... replacements) {
+	public Replacer add(@Nullable Object... replacements) {
 		Objects.requireNonNull(replacements, "Replacements cannot be null");
 		if (replacements.length % 2 != 0)
 			throw new IllegalArgumentException("Invalid Replacer size: " + replacements.length);
-		for (Object replacement : replacements) {
-			if (replacement instanceof Replacement iReplacement)
-				replaceList.add(iReplacement.asReplacement());
-			else
-				replaceList.add(Objects.requireNonNull(replacement, "Null replacements are not allowed"));
-		}
+		for (final Object replacement : replacements)
+			replaceList.add(replacement == null ? "null" : replacement);
 		return this;
 	}
 
@@ -139,7 +134,7 @@ public class Replacer {
 	}
 
 	/*
-	 * String replacements
+	 - String replacements
 	 */
 
 	/**
@@ -165,7 +160,7 @@ public class Replacer {
 		for (int i = 0; i <= repLstLen - 1; i += 2) {
 			final String toSearch = replaceList.get(i).toString();
 			final int searchLen = toSearch.length();
-			final String replacement = replaceList.get(i + 1).toString();
+			final String replacement = getStringValueAt(i + 1);
 			final int replacementLen = replacement.length();
 			int index = res.indexOf(toSearch);
 			while (index != -1) {
@@ -175,6 +170,17 @@ public class Replacer {
 		}
 		return res.toString();
 	}
+
+	private @NotNull String getStringValueAt(final int index) {
+		final Object replacement = replaceList.get(index);
+		if (replacement instanceof final Replacement rep)
+			return rep.asReplacement();
+		return replacement.toString();
+	}
+
+	/*
+	 - List replacements
+	 */
 
 	/**
 	 * Applies this {@link Replacer} to the specified {@link List} of {@link String strings}.
@@ -214,6 +220,7 @@ public class Replacer {
 	public List<String> replaceAt(@NotNull String... strings) {
 		return replaceAtStrings(List.of(strings));
 	}
+
 	/**
 	 * Gets the replacements being used by this {@link Replacer}.
 	 * Modifying this list will have no effect, it can be used
@@ -231,8 +238,15 @@ public class Replacer {
 	}
 
 	/*
-	 * Object override
+	 - Object override
 	 */
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (obj instanceof final Replacer other)
+			return this == other || replaceList.equals(other.replaceList);
+		return false;
+	}
 
 	@NotNull
 	@Override
