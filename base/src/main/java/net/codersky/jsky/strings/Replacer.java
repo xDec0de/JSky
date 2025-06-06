@@ -1,6 +1,7 @@
 package net.codersky.jsky.strings;
 
 import net.codersky.jsky.collections.JCollections;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,7 +32,9 @@ import java.util.Objects;
  */
 public class Replacer implements Cloneable {
 
-	final HashMap<String, Object> replacementsMap = new HashMap<>();
+	/** Internal replacements map. {@code protected} access for extensions. */
+	@ApiStatus.Internal
+	protected final @NotNull HashMap<String, Object> replacementsMap = new HashMap<>();
 
 	/**
 	 * Creates a new {@link Replacer} with the specified {@code replacements}.
