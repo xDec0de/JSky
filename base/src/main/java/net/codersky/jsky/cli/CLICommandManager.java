@@ -1,6 +1,5 @@
 package net.codersky.jsky.cli;
 
-import net.codersky.jsky.strings.JStrings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,6 +15,7 @@ public class CLICommandManager {
 	private final ArrayList<CLICommand> commands = new ArrayList<>();
 	private final CLICommandPool pool;
 	private CLIScannerThread scannerThread = null;
+	private boolean allowBlankArgs = false;
 
 	private Consumer<String> onUnknownCommand = cmd -> System.err.println("Unknown command: " + cmd);
 
@@ -113,6 +113,12 @@ public class CLICommandManager {
 		return this;
 	}
 
+	@NotNull
+	public CLICommandManager setAllowBlankArgs(boolean allowBlankArgs) {
+		this.allowBlankArgs = allowBlankArgs;
+		return this;
+	}
+
 	/*
 	 - Input processing
 	 */
@@ -132,15 +138,21 @@ public class CLICommandManager {
 				i++;
 			} else if (c == '"')
 				onQuote = !onQuote;
-			else if (!onQuote && c == ' ') {
-				inList.add(arg.toString());
-				arg.setLength(0);
-			} else
+			else if (!onQuote && c == ' ')
+				appendToSplitInput(inList, arg);
+			else
 				arg.append(c);
 		}
 		if (!arg.isEmpty())
-			inList.add(arg.toString());
+			appendToSplitInput(inList, arg);
 		return inList.toArray(new String[0]);
+	}
+
+	private void appendToSplitInput(List<String> inList, StringBuilder arg) {
+		final String argStr = arg.toString();
+		if (allowBlankArgs || !argStr.isBlank())
+			inList.add(argStr);
+		arg.setLength(0);
 	}
 
 	@NotNull
