@@ -120,13 +120,17 @@ public class CLICommandManager {
 	private String[] splitInput(@NotNull String input) {
 		if (input.isBlank())
 			return null;
-		final String in = normalizeInput(input);
-		final List<String> inList = new ArrayList<>();
 		final StringBuilder arg = new StringBuilder();
+		final List<String> inList = new ArrayList<>();
+		final String in = normalizeInput(input);
+		final int len = in.length();
 		boolean onQuote = false;
-		for (int i = 0; i < in.length(); i++) {
+		for (int i = 0; i < len; i++) {
 			char c = in.charAt(i);
-			if (c == '"' && (i != 0 && in.charAt(i - 1) != '\\'))
+			if (c == '\\' && ((i + 1) < len) && (in.charAt(i + 1) == '"')) {
+				arg.append('"');
+				i++;
+			} else if (c == '"')
 				onQuote = !onQuote;
 			else if (!onQuote && c == ' ') {
 				inList.add(arg.toString());
