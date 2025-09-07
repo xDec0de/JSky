@@ -15,6 +15,8 @@ public class CLICommandManager {
 	private final CLICommandPool pool;
 	private CLIScannerThread scannerThread = null;
 
+	private Consumer<String> onUnknownCommand = cmd -> System.err.println("Unknown command: " + cmd);
+
 	public CLICommandManager(@Nullable CLICommandPool pool) {
 		this.pool = pool;
 	}
@@ -22,6 +24,10 @@ public class CLICommandManager {
 	public CLICommandManager() {
 		this(null);
 	}
+
+	/*
+	 - Command registration
+	 */
 
 	public synchronized boolean registerCommand(@NotNull CLICommand command) {
 		Objects.requireNonNull(command, "Command cannot be null");
@@ -49,6 +55,10 @@ public class CLICommandManager {
 		return cmd != null && commands.remove(cmd);
 	}
 
+	/*
+	 - Command getter
+	 */
+
 	@Nullable
 	public synchronized CLICommand getCommand(@NotNull String name) {
 		for (CLICommand cmd : this.commands)
@@ -56,6 +66,10 @@ public class CLICommandManager {
 				return cmd;
 		return null;
 	}
+
+	/*
+	 - Start / stop
+	 */
 
 	public boolean isRunning() {
 		return scannerThread != null;
@@ -76,18 +90,39 @@ public class CLICommandManager {
 		return true;
 	}
 
+	/*
+	 - Command pool
+	 */
+
 	@Nullable
 	public synchronized CLICommandPool getPool() {
 		return pool;
 	}
+
+	/*
+	 - CLI Customization
+	 */
+
+	@NotNull
+	public CLICommandManager setOnUnknownCommand(@Nullable Consumer<String> action) {
+		this.onUnknownCommand = action;
+		return this;
+	}
+
+	/*
+	 - Input processing
+	 */
 
 	public boolean process(@NotNull String input) {
 		final String[] parts = Objects.requireNonNull(input).split(" ");
 		if (parts.length == 0)
 			return false;
 		final CLICommand cmd = getCommand(parts[0]);
-		if (cmd == null)
+		if (cmd == null) {
+			if (onUnknownCommand != null)
+				onUnknownCommand.accept(parts[0]);
 			return false;
+		}
 		final String[] args = parts.length == 1 ? new String[0] : Arrays.copyOfRange(parts, 1, parts.length);
 		if (getPool() == null)
 			cmd.onCommand(args);
