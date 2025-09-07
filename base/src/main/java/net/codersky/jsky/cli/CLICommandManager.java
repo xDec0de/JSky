@@ -75,11 +75,13 @@ public class CLICommandManager {
 		return scannerThread != null;
 	}
 
-	public void start() {
+	@NotNull
+	public CLICommandManager start() {
 		if (isRunning())
-			return;
+			return this;
 		this.scannerThread = new CLIScannerThread(this);
 		this.scannerThread.start();
+		return this;
 	}
 
 	public boolean stop() {
