@@ -1,10 +1,12 @@
 package net.codersky.jsky.cli;
 
+import net.codersky.jsky.strings.JStrings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -115,9 +117,47 @@ public class CLICommandManager {
 	 - Input processing
 	 */
 
+	private String[] splitInput(@NotNull String input) {
+		if (input.isBlank())
+			return null;
+		final String in = normalizeInput(input);
+		final List<String> inList = new ArrayList<>();
+		final StringBuilder arg = new StringBuilder();
+		boolean onQuote = false;
+		for (int i = 0; i < in.length(); i++) {
+			char c = in.charAt(i);
+			if (c == '"' && (i != 0 && in.charAt(i - 1) != '\\'))
+				onQuote = !onQuote;
+			else if (!onQuote && c == ' ') {
+				inList.add(arg.toString());
+				arg.setLength(0);
+			} else
+				arg.append(c);
+		}
+		if (!arg.isEmpty())
+			inList.add(arg.toString());
+		return inList.toArray(new String[0]);
+	}
+
+	@NotNull
+	private String normalizeInput(@NotNull String input) {
+		final String in = Objects.requireNonNull(input).stripLeading();
+		final StringBuilder normalized = new StringBuilder();
+		boolean onQuote = false;
+		for (int i = 0; i < in.length(); i++) {
+			char c = in.charAt(i);
+			if (c == '"' && (i != 0 && in.charAt(i - 1) != '\\'))
+				onQuote = !onQuote;
+			else if (!onQuote && (c == ' ' && in.charAt(i - 1) == ' '))
+				continue;
+			normalized.append(c);
+		}
+		return normalized.toString();
+	}
+
 	public boolean process(@NotNull String input) {
-		final String[] parts = Objects.requireNonNull(input).split(" ");
-		if (parts.length == 0)
+		final String[] parts = splitInput(input);
+		if (parts == null)
 			return false;
 		final CLICommand cmd = getCommand(parts[0]);
 		if (cmd == null) {
