@@ -50,10 +50,9 @@ public abstract class CLICommand {
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (obj == null || getClass() != obj.getClass())
-			return false;
-		final CLICommand other = (CLICommand) obj;
-		return Objects.equals(name, other.name) && Objects.deepEquals(aliases, other.aliases);
+		if (obj instanceof final CLICommand other)
+			return Objects.equals(name, other.name) && Objects.deepEquals(aliases, other.aliases);
+		return false;
 	}
 
 	@Override
