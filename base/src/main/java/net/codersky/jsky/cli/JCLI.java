@@ -3,6 +3,7 @@ package net.codersky.jsky.cli;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -88,12 +89,17 @@ public class JCLI {
 	}
 
 	@NotNull
-	public JCLI start() {
+	public JCLI start(@NotNull InputStream stream) {
 		if (isRunning())
 			return this;
 		this.scannerThread = new CLIScannerThread(this);
 		this.scannerThread.start();
 		return this;
+	}
+
+	@NotNull
+	public JCLI start() {
+		return start(System.in);
 	}
 
 	public boolean stop() {
