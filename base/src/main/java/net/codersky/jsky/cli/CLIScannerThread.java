@@ -5,11 +5,11 @@ import java.util.Scanner;
 
 class CLIScannerThread extends Thread {
 
-	private final CLICommandManager manager;
+	private final JCLI cli;
 	private boolean interrupted = false;
 
-	CLIScannerThread(CLICommandManager manager) {
-		this.manager = manager;
+	CLIScannerThread(JCLI cli) {
+		this.cli = cli;
 	}
 
 	@Override
@@ -22,7 +22,7 @@ class CLIScannerThread extends Thread {
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
-			manager.process(scanner.nextLine());
+			cli.process(scanner.nextLine());
 		}
 	}
 

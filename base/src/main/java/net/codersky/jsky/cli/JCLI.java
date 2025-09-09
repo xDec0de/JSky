@@ -10,7 +10,17 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-public class CLICommandManager {
+/**
+ * A basic <b>C</b>ommand <b>L</b>ine <b>I</b>nterface. This
+ * CLI works with a {@link CLIScannerThread} in order to parse
+ * commands on a separate thread that won't interrupt your
+ * application's main thread.
+ *
+ * @since JSky 1.0.0
+ *
+ * @author xDec0de_
+ */
+public class JCLI {
 
 	private final ArrayList<CLICommand> commands = new ArrayList<>();
 	private final CLICommandPool pool;
@@ -19,11 +29,11 @@ public class CLICommandManager {
 
 	private Consumer<String> onUnknownCommand = cmd -> System.err.println("Unknown command: " + cmd);
 
-	public CLICommandManager(@Nullable CLICommandPool pool) {
+	public JCLI(@Nullable CLICommandPool pool) {
 		this.pool = pool;
 	}
 
-	public CLICommandManager() {
+	public JCLI() {
 		this(null);
 	}
 
@@ -78,7 +88,7 @@ public class CLICommandManager {
 	}
 
 	@NotNull
-	public CLICommandManager start() {
+	public JCLI start() {
 		if (isRunning())
 			return this;
 		this.scannerThread = new CLIScannerThread(this);
@@ -104,17 +114,17 @@ public class CLICommandManager {
 	}
 
 	/*
-	 - CLI Customization
+	 - JCLI Customization
 	 */
 
 	@NotNull
-	public CLICommandManager setOnUnknownCommand(@Nullable Consumer<String> action) {
+	public JCLI setOnUnknownCommand(@Nullable Consumer<String> action) {
 		this.onUnknownCommand = action;
 		return this;
 	}
 
 	@NotNull
-	public CLICommandManager setAllowBlankArgs(boolean allowBlankArgs) {
+	public JCLI setAllowBlankArgs(boolean allowBlankArgs) {
 		this.allowBlankArgs = allowBlankArgs;
 		return this;
 	}
