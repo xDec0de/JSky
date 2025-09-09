@@ -6,7 +6,6 @@ import java.util.Scanner;
 class CLIScannerThread extends Thread {
 
 	private final JCLI cli;
-	private boolean interrupted = false;
 
 	CLIScannerThread(JCLI cli) {
 		this.cli = cli;
@@ -15,7 +14,7 @@ class CLIScannerThread extends Thread {
 	@Override
 	public void run() {
 		final Scanner scanner = new Scanner(System.in);
-		while (!interrupted) {
+		while (!isInterrupted()) {
 			try {
 				if (System.in.available() == 0)
 					continue;
@@ -24,11 +23,5 @@ class CLIScannerThread extends Thread {
 			}
 			cli.process(scanner.nextLine());
 		}
-	}
-
-	@Override
-	public void interrupt() {
-		this.interrupted = true;
-		super.interrupt();
 	}
 }
