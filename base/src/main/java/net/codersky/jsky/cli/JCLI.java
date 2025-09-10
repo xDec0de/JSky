@@ -92,7 +92,7 @@ public class JCLI {
 	public JCLI start(@NotNull InputStream stream) {
 		if (isRunning())
 			return this;
-		this.scannerThread = new CLIScannerThread(this);
+		this.scannerThread = new CLIScannerThread(stream, this);
 		this.scannerThread.start();
 		return this;
 	}
@@ -120,7 +120,7 @@ public class JCLI {
 	}
 
 	/*
-	 - JCLI Customization
+	 - CLI Customization
 	 */
 
 	@NotNull
