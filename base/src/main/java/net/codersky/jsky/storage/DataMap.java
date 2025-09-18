@@ -181,6 +181,11 @@ public class DataMap {
 	// - Objects - //
 
 	@Nullable
+	public Object get(@NotNull String key) {
+		return get(key, Object.class);
+	}
+
+	@Nullable
 	public <T> T get(@NotNull String key, @NotNull Class<T> type) {
 		final String actualKey = getActualKey(key);
 		final Map<String, Object> source = getActualMap(key, false);
