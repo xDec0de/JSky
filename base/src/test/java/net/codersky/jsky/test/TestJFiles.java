@@ -23,6 +23,6 @@ public class TestJFiles {
 		one.delete();
 		nested.delete();
 		nest.delete();
-		JTestUtils.TMP_FOLDER.delete();
+		JTestUtils.deleteFolder(JTestUtils.TMP_FOLDER);
 	}
 }
