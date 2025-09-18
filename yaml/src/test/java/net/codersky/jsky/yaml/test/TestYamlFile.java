@@ -6,6 +6,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestYamlFile {
@@ -16,6 +17,13 @@ public class TestYamlFile {
 	public void testFileCreation() {
 		assertTrue(testFile.setup(e -> System.err.println("Exception on YamlFile#setup: " + e.getMessage())));
 		assertTrue(testFile.asFile().exists());
+	}
+
+	@Test
+	public void testDefaultValues() {
+		testFile.setup();
+		assertEquals("str", testFile.getString("str"));
+		assertEquals(42, testFile.getInt("int"));
 	}
 
 	/*

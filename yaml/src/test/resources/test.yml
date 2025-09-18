@@ -1,2 +1,2 @@
-hello: "world"
-code: 42
+str: "str"
+int: 42
