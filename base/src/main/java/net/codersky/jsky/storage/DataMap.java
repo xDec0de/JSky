@@ -196,6 +196,7 @@ public class DataMap {
 
 	// - Lists - //
 
+	@Nullable
 	@SuppressWarnings("unchecked")
 	public List<Object> getList(@NotNull String key) {
 		return get(key, List.class);
@@ -204,13 +205,12 @@ public class DataMap {
 	@Nullable
 	@SuppressWarnings("unchecked")
 	public <T> List<T> getList(@NotNull String key, @NotNull Class<T> type) {
-		final Object obj = get(key, List.class);
-		if (obj instanceof List<?> lst) {
-			if (lst.isEmpty())
-				return List.of();
-			return lst.getFirst().getClass().equals(type) ? (List<T>) lst : null;
-		}
-		return null;
+		final List<Object> lst = getList(key);
+		if (lst == null)
+			return null;
+		if (lst.isEmpty())
+			return List.of();
+		return lst.getFirst().getClass().equals(type) ? (List<T>) lst : null;
 	}
 
 	@NotNull
