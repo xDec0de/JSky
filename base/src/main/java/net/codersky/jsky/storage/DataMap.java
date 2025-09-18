@@ -1,9 +1,11 @@
 package net.codersky.jsky.storage;
 
+import net.codersky.jsky.collections.JCollections;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -214,8 +216,8 @@ public class DataMap {
 		if (lst == null)
 			return null;
 		if (lst.isEmpty())
-			return List.of();
-		return lst.getFirst().getClass().equals(type) ? (List<T>) lst : null;
+			return new ArrayList<>(0);
+		return lst.getFirst().getClass().equals(type) ? (List<T>) JCollections.asArrayList(lst) : null;
 	}
 
 	@NotNull
