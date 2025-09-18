@@ -383,6 +383,32 @@ public abstract class DataProvider {
 	}
 
 	/*
+	 - Getters - Object
+	 */
+
+	@Nullable
+	public Object getObject(@NotNull String key) {
+		return getMap().get(key);
+	}
+
+	@NotNull
+	public Object getObject(@NotNull String key, @NotNull UUID def) {
+		final Object obj = getUUID(key);
+		return obj == null ? def : obj;
+	}
+
+	@Nullable
+	public List<Object> getObjects(@NotNull String key) {
+		return getMap().getList(key);
+	}
+
+	@NotNull
+	public List<Object> getObjects(@NotNull String key, @NotNull List<Object> def) {
+		final List<Object> lst = getObjects(key);
+		return lst == null ? def : lst;
+	}
+
+	/*
 	 - Conversion getters - Date
 	 */
 
