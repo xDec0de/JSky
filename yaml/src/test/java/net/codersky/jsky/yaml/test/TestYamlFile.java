@@ -12,7 +12,7 @@ public class TestYamlFile {
 
 	@Test
 	public void testFileCreation() {
-		JTestUtils.TMP_FOLDER.delete();
+		JTestUtils.deleteFolder(JTestUtils.TMP_FOLDER);
 		assertTrue(testFile.setup(e -> System.err.println("Exception on YamlFile#setup: " + e.getMessage())));
 		assertTrue(testFile.asFile().exists());
 	}
