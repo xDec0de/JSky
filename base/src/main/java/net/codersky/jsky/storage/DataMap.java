@@ -196,6 +196,11 @@ public class DataMap {
 
 	// - Lists - //
 
+	@SuppressWarnings("unchecked")
+	public List<Object> getList(@NotNull String key) {
+		return get(key, List.class);
+	}
+
 	@Nullable
 	@SuppressWarnings("unchecked")
 	public <T> List<T> getList(@NotNull String key, @NotNull Class<T> type) {
