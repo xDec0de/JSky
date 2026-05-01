@@ -1,5 +1,6 @@
 package net.codersky.jsky.storage;
 
+import net.codersky.jsky.collections.JCollections;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -407,13 +408,12 @@ public abstract class DataProvider {
         return date == null ? def : date;
     }
 
-    @Nullable
-    public List<Date> getDates(@NotNull String key) {
-        return getDates(key, null);
+    public @Nullable List<Date> getDates(@NotNull String key) {
+        final List<Long> millis = getLongs(key);
+        return millis == null ? null : JCollections.map(millis, Date::new);
     }
 
-    @Nullable
-    public List<Date> getDates(@NotNull String key, @Nullable List<Date> def) {
+    public @NotNull List<Date> getDates(@NotNull String key, @NotNull List<Date> def) {
         final List<Date> lst = getDates(key);
         return lst == null ? def : lst;
     }

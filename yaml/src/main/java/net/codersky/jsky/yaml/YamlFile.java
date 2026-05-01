@@ -11,7 +11,6 @@ import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -255,13 +254,13 @@ public class YamlFile extends DataManager implements Reloadable {
      * @since JSky 1.0.0
      */
     public boolean reload(@NotNull Consumer<Exception> onException) {
-        try {
+        try (FileInputStream stream = new FileInputStream(this.file)) {
             getMap().clear();
-            final HashMap<String, Object> loadedMap = this.yaml.load(new FileInputStream(this.file));
+            final HashMap<String, Object> loadedMap = this.yaml.load(stream);
             if (loadedMap != null) // May be null on empty files
                 getMap().getInternalMap().putAll(loadedMap);
             return true;
-        } catch (FileNotFoundException | SecurityException ex) {
+        } catch (IOException | SecurityException ex) {
             onException.accept(ex);
             return false;
         }

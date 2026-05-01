@@ -7,6 +7,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -268,6 +269,7 @@ public class DataMap {
     public boolean update(@NotNull HashMap<String, Object> updatedMap, @Nullable List<String> ignored) {
         int changes = 0;
         final HashMap<String, Object> internalMap = getInternalMap();
+
         // Add new keys
         for (Map.Entry<String, Object> entry : updatedMap.entrySet()) {
             if (!internalMap.containsKey(entry.getKey()) && !isIgnored(entry.getKey(), ignored)) {
@@ -275,10 +277,13 @@ public class DataMap {
                 changes++;
             }
         }
-        // Remove old keys
-        for (Map.Entry<String, Object> entry : internalMap.entrySet()) {
+
+        // Remove old keys. Iterator.remove avoids ConcurrentModificationException
+        final Iterator<Map.Entry<String, Object>> it = internalMap.entrySet().iterator();
+        while (it.hasNext()) {
+            final Map.Entry<String, Object> entry = it.next();
             if (!updatedMap.containsKey(entry.getKey()) && !isIgnored(entry.getKey(), ignored)) {
-                internalMap.remove(entry.getKey());
+                it.remove();
                 changes++;
             }
         }
