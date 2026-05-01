@@ -1,11 +1,11 @@
 rootProject.name = "JSky"
 
 dependencyResolutionManagement {
-	versionCatalogs {
-		create("libs") {
-			from(files("libs.versions.toml"))
-		}
-	}
+    versionCatalogs {
+        create("libs") {
+            from(files("libs.versions.toml"))
+        }
+    }
 }
 
 include("base")

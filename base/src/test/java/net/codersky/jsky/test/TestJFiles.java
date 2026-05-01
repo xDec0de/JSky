@@ -9,20 +9,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestJFiles {
 
-	final File one = new File(JTestUtils.TMP_FOLDER, "one");
-	final File nest = new File(JTestUtils.TMP_FOLDER, "nest");
-	final File nested = new File(nest, "nested");
+    final File one = new File(JTestUtils.TMP_FOLDER, "one");
+    final File nest = new File(JTestUtils.TMP_FOLDER, "nest");
+    final File nested = new File(nest, "nested");
 
-	@Test
-	public void testFileCreation() {
-		assertTrue(JFiles.create(one));
-		assertTrue(one.exists() && one.isFile());
-		assertTrue(JFiles.create(one));
-		assertTrue(JFiles.create(nested));
-		assertTrue(nested.exists() && nested.isFile());
-		one.delete();
-		nested.delete();
-		nest.delete();
-		JTestUtils.deleteFolder(JTestUtils.TMP_FOLDER);
-	}
+    @Test
+    public void testFileCreation() {
+        assertTrue(JFiles.create(one));
+        assertTrue(one.exists() && one.isFile());
+        assertTrue(JFiles.create(one));
+        assertTrue(JFiles.create(nested));
+        assertTrue(nested.exists() && nested.isFile());
+        one.delete();
+        nested.delete();
+        nest.delete();
+        JTestUtils.deleteFolder(JTestUtils.TMP_FOLDER);
+    }
 }

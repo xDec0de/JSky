@@ -40,3 +40,6 @@ bin/
 
 ### Tests ###
 **/src/test/tmp
+
+### Claude ###
+CLAUDE.md

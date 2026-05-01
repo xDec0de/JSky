@@ -11,32 +11,32 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestYamlFile {
 
-	final YamlFile testFile = new YamlFile(JTestUtils.TMP_FOLDER, "test.yml");
+    final YamlFile testFile = new YamlFile(JTestUtils.TMP_FOLDER, "test.yml");
 
-	@Test
-	public void testFileCreation() {
-		assertTrue(testFile.setup(e -> System.err.println("Exception on YamlFile#setup: " + e.getMessage())));
-		assertTrue(testFile.asFile().exists());
-	}
+    @Test
+    public void testFileCreation() {
+        assertTrue(testFile.setup(e -> System.err.println("Exception on YamlFile#setup: " + e.getMessage())));
+        assertTrue(testFile.asFile().exists());
+    }
 
-	@Test
-	public void testDefaultValues() {
-		testFile.setup();
-		assertEquals("str", testFile.getString("str"));
-		assertEquals(42, testFile.getInt("int"));
-	}
+    @Test
+    public void testDefaultValues() {
+        testFile.setup();
+        assertEquals("str", testFile.getString("str"));
+        assertEquals(42, testFile.getInt("int"));
+    }
 
 	/*
 	 - Before & after test actions
 	 */
 
-	@BeforeEach
-	public void beforeEach() {
-		JTestUtils.deleteFolder(JTestUtils.TMP_FOLDER);
-	}
+    @BeforeEach
+    public void beforeEach() {
+        JTestUtils.deleteFolder(JTestUtils.TMP_FOLDER);
+    }
 
-	@AfterAll
-	public static void afterAll() {
-		JTestUtils.deleteFolder(JTestUtils.TMP_FOLDER);
-	}
+    @AfterAll
+    public static void afterAll() {
+        JTestUtils.deleteFolder(JTestUtils.TMP_FOLDER);
+    }
 }

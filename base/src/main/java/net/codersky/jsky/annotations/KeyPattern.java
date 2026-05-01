@@ -10,12 +10,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * The KeyPattern annotation claims that any element annotated
- * with it must follow the key format that is commonly used on
- * JSky as a standard. This pattern only allows lowercase
- * words separated by single dashes ('-'). This standard is
- * most commonly used on {@link java.util.Map maps}. The
- * {@link JStrings#hasKeyPattern(CharSequence)} method is provided
+ * The KeyPattern annotation claims that any element annotated with it must follow the key format that is commonly used
+ * on JSky as a standard. This pattern only allows lowercase words separated by single dashes ('-'). This standard is
+ * most commonly used on {@link java.util.Map maps}. The {@link JStrings#hasKeyPattern(CharSequence)} method is provided
  * to check if a {@link CharSequence} follows this pattern.
  * <p>
  * The pattern enforces the following rules:
@@ -35,11 +32,11 @@ import java.lang.annotation.Target;
  * that it cannot be combined with other patterns, not until we find
  * a solution that doesn't rely on the {@link Pattern} annotation.
  *
- * @since JSky 1.0.0
- *
  * @see JStrings#hasKeyPattern(CharSequence)
+ * @since JSky 1.0.0
  */
 @Retention(RetentionPolicy.CLASS)
 @Target({ElementType.METHOD, ElementType.PARAMETER, ElementType.FIELD})
 @Pattern("[a-z]+(-[a-z]+)*")
-public @interface KeyPattern {}
+public @interface KeyPattern {
+}

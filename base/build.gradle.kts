@@ -1,26 +1,27 @@
 plugins {
-	`java-library`
-	`java-test-fixtures`
+    `java-library`
+    `java-test-fixtures`
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	compileOnly(libs.jetbrains.annotations)
+    compileOnly(libs.jetbrains.annotations)
 
-	testCompileOnly(libs.jetbrains.annotations)
-	testImplementation(platform(libs.junit.bom))
-	testImplementation("org.junit.jupiter:junit-jupiter")
+    testCompileOnly(libs.jetbrains.annotations)
+    testImplementation(platform(libs.junit.bom))
+    testImplementation(libs.junit.jupiter)
+    testRuntimeOnly(libs.junit.platform.launcher)
 }
 
 java {
-	withSourcesJar()
+    withSourcesJar()
 }
 
 tasks {
-	jar {
-		archiveFileName.set("JSky-${project.version}.jar")
-	}
+    jar {
+        archiveFileName.set("JSky-${project.version}.jar")
+    }
 }
