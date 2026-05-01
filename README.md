@@ -11,7 +11,7 @@ JSky is split into two artifacts so consumers only pull in what they use.
 
 | Module | Coordinates | Depends on |
 | :---: | :--- | :---: |
-| `base` | `net.codersky.jsky:base` | — |
+| `base` | `net.codersky.jsky:base` | none |
 | `yaml` | `net.codersky.jsky:yaml` | `base` + SnakeYAML |
 
 The `yaml` module ships its SnakeYAML dependency unrelocated on purpose; consumers that already provide SnakeYAML can exclude it.
