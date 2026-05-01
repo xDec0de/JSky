@@ -30,12 +30,20 @@ jobs:
       - name: Build and run tests with coverage
         run: ./gradlew codeCoverageReport --no-build-cache --parallel
 
+      - name: Upload coverage to Codacy
+        env:
+          CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
+        shell: bash
+        run: |
+          bash <(curl -Ls https://coverage.codacy.com/get.sh) report \
+            -r build/reports/jacoco/codeCoverageReport/codeCoverageReport.xml
+
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: build/reports/jacoco/codeCoverageReport/codeCoverageReport.xml
-          fail_ci_if_error: true
+          fail_ci_if_error: false
           verbose: true
 
       - name: Upload build artifacts
